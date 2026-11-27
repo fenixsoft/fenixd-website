@@ -1,0 +1,65 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>核心概念与架构 · Fenixd 帮助</title><style>body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;color:#1f2937;max-width:860px;margin:0 auto;padding:48px 24px;line-height:1.75;font-size:15px}h1{font-size:30px;border-bottom:2px solid #e5e7eb;padding-bottom:12px}h2{font-size:22px;margin-top:36px}h3{font-size:17px;margin-top:28px}code{background:#f3f4f6;border:1px solid #e5e7eb;border-radius:4px;padding:1px 5px;font-size:13px;font-family:ui-monospace,Menlo,Consolas,monospace}pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:10px;overflow-x:auto}pre code{background:none;border:0;color:inherit;padding:0}table{border-collapse:collapse;margin:16px 0;width:100%}th,td{border:1px solid #e5e7eb;padding:7px 11px;font-size:13.5px;text-align:left}th{background:#f9fafb}tr:nth-child(even) td{background:#fafafa}blockquote{border-left:3px solid #d1d5db;margin:14px 0;padding:4px 16px;color:#6b7280;background:#f9fafb}hr{border:0;border-top:1px solid #e5e7eb;margin:28px 0}a{color:#9c2f81}.back{display:inline-block;margin-bottom:20px;font-size:13.5px;color:#9c2f81;text-decoration:none}.back:hover{text-decoration:underline}.meta{color:#9ca3af;font-size:12px;margin-top:40px;border-top:1px solid #e5e7eb;padding-top:12px}pre.mermaid{background:none;border:0;padding:0;margin:16px 0;overflow-x:auto;text-align:center}pre.mermaid svg{max-width:100%;height:auto}.mm-err{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#4b5563;white-space:pre-wrap;text-align:left}</style></head><body><a class="back" href="../docs.html">← 返回文档中心</a><h1>核心概念与架构</h1><p>理解 Fenix 的闭环自动化原理、Agent 角色分工与执行模式。</p><h2>闭环自动化</h2><p>Fenix 是一个<strong>闭环</strong>开发框架：需求输入后，从设计、实现、验证到发布全程自动化，仅在最终推送时需要人工审批。支撑这个闭环的是四个核心设计：</p><ol><li><strong>SPEC 驱动</strong>：一切工作围绕 SPEC（软件需求规格说明书）展开，每个 SPEC 对应一个 <code>spec/changes/<name>/</code> 目录</li><li><strong>状态机管控</strong>：SPEC 生命周期由有限状态机（11 个状态、明确转移规则）驱动，杜绝模糊中间态</li><li><strong>闭环验证</strong>：实现后自动启动被测实例、执行场景、判定通过/失败，失败自动打回修复</li><li><strong>唯一人工门禁</strong>：<code>/fenix-approve</code> 推送审批是全流程中唯一需要人工参与的环节</li></ol><h2>架构概览</h2><pre class="mermaid">graph TB
+    subgraph DAEMON ["Fenix Daemon"]
+        FW["File Watcher\n（文件监听器，2 秒轮询）"]
+        SC["Periodic Scan\n（兜底全量扫描，默认 30 分钟）"]
+        AM["Admin Monitor\n（告警监视器）"]
+        PM["PM Engine\n（调度引擎）"]
+        SM["State Machine\n（状态机）"]
+        FW -.-&gt; PM
+        SC -.-&gt; PM
+        PM --&gt; SM
+    end
+
+    subgraph POOL ["Agent Pool（十四类 Agent）"]
+        IMP["Implementer\n（实现者）"]
+        VER["Verifier\n（验证者）"]
+        PP["Planner-Plan\n（规划器）"]
+        PJ["Planner-Judge\n（门禁法官）"]
+        FT["Fast-Track\n（轻量实现）"]
+        ADM["Administrator\n（自愈运维）"]
+        SR["Self-Review\n（自省）"]
+        DJ["Dispute-Judge\n（争议法官）"]
+        EV["Evolution\n（自进化）"]
+        REV["Spec-Review\n（方案评审）"]
+        CR["Code-Review\n（代码审查）"]
+        REP["Repair\n（合回救回）"]
+        ARB["Arbiter\n（仲裁者）"]
+        IMP ~~~ PP
+        PP ~~~ FT
+        VER ~~~ PJ
+        PJ ~~~ ADM
+        ADM ~~~ SR
+        SR ~~~ EV
+        DJ ~~~ REV
+        REV ~~~ CR
+        CR ~~~ REP
+        REP ~~~ ARB
+    end
+
+    subgraph DASH ["Dashboard"]
+        API["REST API\n（/api/*）"]
+        WEB["Web UI\n（概览/项目/配置/运维/指挥中心/帮助）"]
+        API -.-&gt; WEB
+    end
+
+    PM --&gt; IMP
+    PM --&gt; VER
+    AM --&gt; ADM
+    SM -.-&gt; API
+    SM ~~~ IMP
+    SM ~~~ VER
+    SR ~~~ API</pre><p>从图上可以看出分工：PM Engine 是调度中枢，做派发决策并唤起 Agent Pool 中的各类 Agent；State Machine 维护 SPEC 的状态转移；Admin Monitor 监视困境信号，必要时唤起 Administrator 自愈；File Watcher 监听文件变化反馈给 PM Engine，Periodic Scan 则按固定间隔做兜底全量扫描，捞出监听器漏掉的事件与没有事件源的孤儿态。对外则由 REST API 把状态暴露给 Web UI 展示。</p><p>两条入边的分工是理解调度的关键：<strong>正常唤醒靠文件监听（2 秒级），兜底扫描只是安全网</strong>。各唤醒源的间隔、成本实测与已知盲区见<a href="06-governance.md#调度节拍spec-何时被唤醒">调度与治理规则</a>。</p><h2>十四类 Agent 角色</h2><table><thead><tr><th>Agent 类型</th><th>职责</th><th>触发时机</th></tr></thead><tbody><tr><td><strong>implementer</strong>（实现者）</td><td>在独立 worktree 中编写代码，实现 SPEC tasks</td><td>SPEC 状态 <code>ready</code></td></tr><tr><td><strong>verifier</strong>（验证者）</td><td>启动被测实例、执行验证场景、生成验证报告</td><td>SPEC 状态 <code>implemented</code></td></tr><tr><td><strong>planner-plan</strong>（规划器）</td><td>生成验证场景与行动计划</td><td>验证流水线阶段 1</td></tr><tr><td><strong>planner-judge</strong>（门禁法官）</td><td>判定验证是否通过，决定 verified/bug-found</td><td>验证流水线阶段 3</td></tr><tr><td><strong>fast-track</strong>（轻量实现）</td><td>合并 implementer + verifier 为单次调用，减少 token 消耗</td><td>满足 fast-track 条件时</td></tr><tr><td><strong>administrator</strong>（自愈运维）</td><td>检测困境信号、诊断根因、尝试自动修复</td><td>Admin Monitor 唤起</td></tr><tr><td><strong>self-review</strong>（自省）</td><td>每日自动审查实现质量、配置一致性</td><td>定时触发</td></tr><tr><td><strong>dispute-judge</strong>（争议法官）</td><td>对实现者/验证者的声明争议做只读裁决</td><td>争议仲裁触发</td></tr><tr><td><strong>evolution</strong>（自进化）</td><td>从自省报告提炼需求、批量产出 evo-* SPEC</td><td>定时触发</td></tr><tr><td><strong>spec-review</strong>（方案评审）</td><td>阅读 SPEC 三文档做方案级评审（goal-fit/hole/regression），结论 approved/repaired/rejected</td><td><code>drafted → reviewing</code> 晋升门禁</td></tr><tr><td><strong>code-review</strong>（代码审查）</td><td>周期性仓库级代码审查，问题沉淀为可追踪台账（<code>.fenix/code-review/items.jsonl</code>），供项目页「代码审查」分面消费并生成 fix-cr-* 修复 SPEC</td><td>每日自省时点同步触发 / 项目页「代码审查」分面手动触发</td></tr><tr><td><strong>code-fix</strong>（代码修复）</td><td>按批修复 code-review 台账的 <code>open</code> 条目：在独立 worktree 内修复并提交，全量回归通过才合回主树</td><td>审查收尾产生新 <code>open</code> 条目 / full scan 周期兜底 / 项目页「代码审查」分面手动触发</td></tr><tr><td><strong>repair</strong>（合回救回）</td><td>merge-back 冲突定向救回：在实现 worktree（或换壳全新 worktree）内修复冲突合并并完成验证</td><td>实现代码合回主分支发生冲突时</td></tr><tr><td><strong>arbiter</strong>（仲裁者）</td><td>处置链第二级全局视野裁决：冻结升级/Admin 配额耗尽时接单，按自主处置白名单动作并落报告与 outcome 双道硬门</td><td>处置链升级边触发（Admin 让位/配额耗尽/冻结鉴定）</td></tr></tbody></table><h2>full 模式 vs fast-track 模式</h2><p>Fenix 有两种实现-验证路径，在立项时定档：/fenix-new 按需求复杂度评估给出建议，与用户确认后写入 SPEC 的 <code>mode</code> 字段（缺省 <code>full</code>），daemon 按该字段分流派发。</p><h3>full 模式（标准闭环）</h3><pre class="mermaid">sequenceDiagram
+    participant PM as PM Engine
+    participant IMP as Implementer
+    participant VER as Verifier
+    participant JUDGE as Planner-Judge
+
+    PM-&gt;&gt;IMP: 派出 implementer
+    IMP-&gt;&gt;IMP: 在 worktree 中编写代码
+    IMP-&gt;&gt;PM: 完成 → implemented
+    PM-&gt;&gt;VER: 派出 verifier
+    VER-&gt;&gt;VER: 构建→启动→场景→报告
+    VER-&gt;&gt;PM: 完成验证报告
+    PM-&gt;&gt;JUDGE: 派出 planner-judge
+    JUDGE-&gt;&gt;JUDGE: 判定 verified/bug-found
+    JUDGE-&gt;&gt;PM: 判定结果</pre><h3>fast-track 模式（轻量合并）</h3><p>fast-track 把实现与验证合并为单次 Agent 调用，省去独立的 verifier 调用与部分 worktree 开销，token 消耗更低。适用条件是影响面小且验证简单，立项评估的四维参考：单点小改动、模块数不超过 1、无 UI 与数据迁移、预期验证场景不超过 3 个；/fenix-new 据此给出建议，用户也可用 <code>--fast-track</code>/<code>--full</code> 显式指定。运行失败也不会回退为 full 模式——恢复重入仍走 fast-track 收尾路径。</p><h2>Worktree 隔离</h2><p>每个 implementer/verifier run 都在独立的 git worktree 中工作。隔离带来三层保障：并行的多个 SPEC 实现互不交叉污染；run 结束后 worktree 自动移除，不留垃圾目录；代码完成后经 merge-back 合并回主分支。</p><h2>LLM Provider 隔离</h2><p>Agent 角色的模型通道由配置决定：<code>llm.providers</code> 注册 Provider，<code>agents.models</code> 按角色分配（键参考见<a href="09-config.md#llm">配置参考</a>）。<strong>配置了 Provider 分配的角色</strong>，daemon 派发子进程时会注入该 Provider 的 <code>ANTHROPIC_BASE_URL / API_KEY / MODEL</code>，并把 <code>CLAUDE_CONFIG_DIR</code> 指向项目根（主树）<code>.fenix/agent-config/<provider>/</code> 的独立配置目录，分配谁就走谁，与用户会话完全隔离（不同账号、配额与故障域）。目录按 Provider 名区分、按需幂等生成，全部 worktree 的 run 共用同一份。</p><h3>为什么必须换整个配置根目录</h3><p>根因是 claude CLI 的优先级规则：<strong><code>~/.claude/settings.json</code> 中 <code>env</code> 块的优先级高于进程环境变量</strong>。用户级 settings.json 若配置过网关地址（如 cc-switch 的 <code>ANTHROPIC_BASE_URL</code>），仅靠环境变量注入的 Provider 会被它静默覆盖，分配沦为死代码，所有 Agent 实际仍打到网关。实测 <code>--settings <file></code> 也无法覆盖该 env 块，唯一有效手段是 <code>CLAUDE_CONFIG_DIR</code> 切换配置根目录，彻底绕开用户 settings.json。</p><h3>隔离目录里什么共享、什么隔离</h3><table><thead><tr><th>内容</th><th>处理方式</th></tr></thead><tbody><tr><td>skills / plugins</td><td><strong>共享</strong>：symlink 指向 <code>~/.claude/</code>，所有 Provider 同一份技能与插件</td></tr><tr><td>settings.json</td><td>按 Provider 重新生成：<code>enabledPlugins</code> 复制自 <code>~/.claude/settings.json</code>，hooks 复制自 <code>.fenix/agent-settings.json</code>；<strong>宿主 <code>env</code> 不复制</strong>（网关的模型映射类变量对直连 Provider 无用且有毒），分配了模型时按 Provider 写入子代理模型映射 <code>env</code>（<code>CLAUDE_CODE_SUBAGENT_MODEL</code> 与 <code>ANTHROPIC_DEFAULT_*_MODEL</code>）</td></tr><tr><td>会话 transcript、任务数据、session-env、shell-snapshots、<code>.claude.json</code></td><td><strong>按 Provider 隔离</strong>（API Key 只经进程环境注入，不落盘）</td></tr></tbody></table><p>会话类数据跟随配置根目录被隔离，且这恰好是必要的语义，不是单纯副作用：</p><ul><li><strong>跨 Provider 不能续跑</strong>。会话 transcript 存在于创建时的配置目录；切换 Provider 后携带旧 session id 去 <code>--resume</code> 必然「No conversation found」秒挂。框架的规则是<strong>仅当 worktree 可复用且 Provider 未变时才续跑</strong>，切换 Provider 即开新会话。</li><li><strong>TaskCreate 等工具的可用性由网络路径决定</strong>。部分代理网关不提供 Task 工具族、Provider 直连有，会话 init 时即定型，工具集本身就不是跨 Provider 通用的。</li></ul><p>未配置 Provider 分配的角色零隔离：不设 <code>CLAUDE_CONFIG_DIR</code>，透传 <code>~/.claude/settings.json</code> 走默认网关（官方模型名，由网关自行映射）。</p><h3>观测与注意</h3><ul><li>每个带 Provider 分配的 run 会在 run 产物写 provider_marker，SPEC 详情时间轴可见该次 run 实际驱动的 <code>model@provider</code>。</li><li>隔离目录的 <code>settings.json</code> 按内容幂等重建：已存在且与将写入内容一致（含 <code>_schema_version</code> 标记）则跳过；修改 <code>~/.claude/settings.json</code> 的 enabledPlugins 或 <code>.fenix/agent-settings.json</code> 后，下次派发即按内容比对自动原子重写，无需手动删除重建。</li></ul><h2>多项目机制</h2><p>Dashboard 支持同时监控多个 Fenixd 项目。每个项目拥有自己的 <code>.fenix/config.yaml</code> 与独立运行的 daemon，互不干扰；Dashboard 把它们聚合到同一个界面里，跨项目的状态、告警与进度一目了然。</p><h2>术语表</h2><table><thead><tr><th>术语</th><th>含义</th></tr></thead><tbody><tr><td><strong>SPEC</strong></td><td>软件需求规格说明书，对应 <code>spec/changes/<name>/</code> 目录</td></tr><tr><td><strong>STATE.md</strong></td><td><code>.fenix/</code> 目录下的状态文件，记录所有 SPEC 的当前状态与元数据</td></tr><tr><td><strong>worktree</strong></td><td>Git 工作树，提供隔离的代码工作区</td></tr><tr><td><strong>verify.yaml</strong></td><td>项目级验证契约，声明构建、启动、就绪探针（纯 CLI 交付可只声明 prepare）</td></tr><tr><td><strong>场景 kind</strong></td><td>验证场景形态（web/cli/api）：页面→web、HTTP 端点→api、命令/落盘→cli；混合交付拆场景 + <code>depends_on</code> 串接</td></tr><tr><td><strong>门禁</strong></td><td>验证后由 planner-judge 判定通过/失败的环节</td></tr><tr><td><strong>熔断</strong></td><td>预算耗尽或连续失败达到阈值后停止自动重派，升级人工</td></tr><tr><td><strong>Provider 隔离</strong></td><td>按 Provider 名切分 <code>CLAUDE_CONFIG_DIR</code> 配置根，让 Agent 的模型通道绝对生效（见 <a href="#llm-provider-隔离">LLM Provider 隔离</a>）</td></tr><tr><td><strong>困境信号</strong></td><td>Admin Monitor 检测到的 SPEC 异常状态（卡住、抖动、合并反复失败等）</td></tr><tr><td><strong>BASE_URL 铁律</strong></td><td>验证场景的 URL 永远改写为本次被测实例地址，确保测到最新代码</td></tr></tbody></table><h2>相关文档</h2><ul><li><a href="01-quick-start.html">快速上手</a> — 端到端流程实操</li><li><a href="03-lifecycle.html">生命周期与状态机</a> — 11 状态详细转移规则</li><li><a href="05-verification.html">验证体系</a> — 三步流水线与 verify.yaml 契约</li><li><a href="06-governance.html">调度与治理规则</a> — 预算、熔断、告警分级</li></ul><p class="meta">本页由 Fenixd 仓库 docs/help/02-concepts.md 渲染生成。</p><script src="../mermaid.min.js"></script><script>mermaid.initialize({startOnLoad:false,theme:"neutral",securityLevel:"strict",fontFamily:"system-ui,-apple-system,sans-serif",fontSize:14,themeVariables:{fontSize:"14px"},sequence:{actorFontSize:14,messageFontSize:14,noteFontSize:14}});mermaid.run({querySelector:"pre.mermaid"}).catch(function(e){document.querySelectorAll("pre.mermaid").forEach(function(p){if(!p.querySelector("svg")){p.classList.add("mm-err");}});});</script>

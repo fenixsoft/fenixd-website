@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page="home">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fenixd · 官网首页（原型）</title>
+<link rel="icon" href="logo-64.png">
+<style>
+:root{
+  --bg:#FAFAFA; --bg-elev:#FFFFFF; --card:#FFFFFF; --card-2:#F4F4F5;
+  --line:#E5E7EB; --line-strong:#D1D5DB;
+  --text:#111827; --text-2:#6B7280; --text-3:#9CA3AF;
+  --ember:#F97316; --ember-hi:#FBBF24; --ember-soft:#EA580C;
+  --ember-deep:#C2410C;
+  --tint-bg:#FFF7ED; --tint-soft:#FFEDD5; --tint-line:#FED7AA; --tint-edge:#FDBA74;
+  --focus-ring:rgba(249,115,22,.15); --glow-a:rgba(249,115,22,.08); --glow-b:rgba(251,191,36,.07);
+  --hl-edge:rgba(249,115,22,.55); --term-ember:#FB923C;
+  --verified:#16A34A; --link:var(--ember-soft); --warn:#B45309; --danger:#DC2626;
+  --grad-brand:linear-gradient(120deg,#EA580C,#F97316);
+  --term-bg:#0F172A; --term-bar:#0B1220;
+  --mono:ui-monospace,'SF Mono','Cascadia Code','JetBrains Mono',Menlo,Consolas,'Liberation Mono',monospace;
+  --sans:system-ui,-apple-system,'Segoe UI',Roboto,'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Noto Sans SC',sans-serif;
+  --radius:16px; --maxw:1200px; --header-h:64px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);
+  font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+img,svg{display:block}
+a{color:var(--link);text-decoration:none}
+a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--ember-soft);outline-offset:2px;border-radius:4px}
+.skip-link{position:absolute;left:-999px;top:8px;z-index:200;background:var(--ember);
+  color:#fff;padding:8px 14px;border-radius:8px;font-weight:600}
+.skip-link:focus{left:8px}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+.mono{font-family:var(--mono)}
+.num{font-variant-numeric:tabular-nums}
+
+/* ---------- 仿样横幅（plain 层必需） ---------- */
+.proto-banner{background:var(--tint-bg);color:var(--ember-deep);border-bottom:1px solid var(--tint-line);
+  font-size:12.5px;line-height:1.5;padding:7px 24px;text-align:center}
+.proto-banner strong{color:var(--ember-deep)}
+
+/* ---------- 头部导航 ---------- */
+.site-header{position:sticky;top:0;z-index:100;height:var(--header-h);
+  background:rgba(255,255,255,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.header-in{max-width:var(--maxw);margin:0 auto;padding:0 24px;height:100%;
+  display:flex;align-items:center;gap:28px}
+.logo{display:flex;align-items:center;gap:10px;color:var(--text);font-weight:700;
+  font-size:18px;letter-spacing:.2px}
+.logo:hover{text-decoration:none}
+.logo .logo-mark{width:26px;height:26px;color:var(--ember)}
+.logo .logo-mark svg{width:26px;height:26px}
+.logo .logo-mark img,.chat-logo img{width:100%;height:100%;object-fit:contain;display:block}
+.logo .logo-lockup{display:block;flex:none}
+.main-nav{display:flex;gap:4px;margin-left:8px}
+.main-nav a{color:var(--text-2);font-size:14.5px;padding:8px 12px;border-radius:8px;
+  position:relative;transition:color .16s,background .16s}
+.main-nav a:hover{color:var(--text);background:rgba(17,24,39,.05);text-decoration:none}
+.main-nav a.active{color:var(--text)}
+.main-nav a.active::after{content:"";position:absolute;left:12px;right:12px;bottom:2px;
+  height:2px;border-radius:2px;background:var(--grad-brand)}
+.header-actions{margin-left:auto;display:flex;align-items:center;gap:12px}
+.lang-toggle{display:flex;border:1px solid var(--line-strong);border-radius:999px;overflow:hidden}
+.lang-toggle button{background:transparent;border:0;color:var(--text-2);cursor:pointer;
+  font-family:var(--mono);font-size:12px;padding:6px 12px;transition:background .16s,color .16s}
+.lang-toggle button.on{background:var(--tint-bg);color:var(--ember-deep)}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;
+  border-radius:8px;border:1px solid var(--line);color:var(--text-2);cursor:pointer;
+  background:transparent;transition:color .16s,border-color .16s}
+.icon-btn:hover{color:var(--text);border-color:var(--line-strong)}
+.gh-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;
+  color:var(--text-2);transition:color .16s}
+.gh-btn:hover{color:var(--ember)}
+.icon-btn svg{width:18px;height:18px}
+.gh-btn svg{width:18px;height:18px}
+.btn{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:14.5px;
+  border-radius:9px;padding:10px 18px;cursor:pointer;border:1px solid transparent;
+  transition:filter .16s,background .16s,border-color .16s}
+.btn svg{width:16px;height:16px}
+.btn-primary{background:var(--ember);color:#fff}
+.btn-primary:hover{background:var(--ember-soft);text-decoration:none}
+.btn-ghost{border-color:var(--line-strong);color:var(--text)}
+.btn-ghost:hover{background:rgba(17,24,39,.05);text-decoration:none}
+.btn-sm{padding:7px 14px;font-size:13.5px}
+.btn-lg{padding:13px 26px;font-size:16px}
+.nav-burger{display:none}
+.mobile-nav{display:none}
+
+/* ---------- 通用 section ---------- */
+.section{padding:88px 0;border-top:1px solid var(--line)}
+.section:first-of-type{border-top:0}
+.eyebrow{font-family:var(--mono);font-size:12.5px;letter-spacing:.22em;color:var(--ember-soft);
+  text-transform:uppercase;display:flex;align-items:center;gap:10px;margin:0 0 14px}
+.eyebrow::before{content:"";width:26px;height:1px;background:var(--grad-brand)}
+h2.sec-title{font-size:32px;line-height:1.25;margin:0 0 14px;font-weight:700;letter-spacing:-.01em}
+.sec-lede{color:var(--text-2);font-size:17px;max-width:640px;margin:0 0 40px}
+.grad-text{background:var(--grad-brand);-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent}
+
+/* ---------- Hero ---------- */
+.hero{padding:96px 0 72px;border-top:0;
+  background:radial-gradient(640px 320px at 88% 8%,var(--glow-a),transparent 70%),
+             radial-gradient(520px 280px at 6% 96%,var(--glow-b),transparent 70%)}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+.hero h1{font-size:50px;line-height:1.18;letter-spacing:-.02em;margin:0 0 22px;font-weight:800}
+.hero .lede{color:var(--text-2);font-size:17.5px;max-width:520px;margin:0 0 32px}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap}
+
+/* ---------- 伪终端 ---------- */
+.term{background:var(--term-bg);border:1px solid var(--line-strong);border-radius:var(--radius);
+  overflow:hidden;box-shadow:0 8px 24px rgba(15,23,42,.12)}
+.term-bar{display:flex;align-items:center;gap:8px;padding:11px 14px;
+  border-bottom:1px solid rgba(148,163,184,.16);background:var(--term-bar)}
+.term-dot{width:11px;height:11px;border-radius:50%;background:#334155}
+.term-dot:nth-child(1){background:#F87171}.term-dot:nth-child(2){background:#FBBF24}
+.term-dot:nth-child(3){background:#22C55E}
+.term-title{margin-left:8px;font-family:var(--mono);font-size:12px;color:#94A3B8}
+.term-body{padding:18px 18px 22px;font-family:var(--mono);font-size:13px;line-height:1.85;
+  color:#CBD5E1;overflow-x:auto}
+.t-p{color:var(--term-ember)}      /* 提示符 */
+.t-c{color:#F1F5F9}      /* 命令 */
+.t-o{color:#CBD5E1}      /* 输出 */
+.t-dim{color:#64748B}    /* 弱输出 */
+.t-ok{color:#4ADE80}     /* 成功 */
+.t-w{color:#FBBF24}      /* 等待 */
+.t-key{color:#7CB0FF}    /* 关键字 */
+
+/* ---------- 对话面板（AI-Native hero，方案 D） ---------- */
+.chat{background:var(--bg-elev);border:1px solid var(--line);border-radius:var(--radius);
+  overflow:hidden;box-shadow:0 8px 24px rgba(15,23,42,.08);display:flex;flex-direction:column}
+.chat-head{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line)}
+.chat-logo{width:28px;height:28px;border-radius:8px;background:var(--tint-bg);border:1px solid var(--tint-line);
+  color:var(--ember-soft);display:flex;align-items:center;justify-content:center;flex:none}
+.chat-logo svg{width:16px;height:16px}
+.chat-title{font-family:var(--mono);font-size:12px;color:var(--text-2)}
+.chat-body{padding:16px;display:flex;flex-direction:column;gap:12px;min-height:340px}
+.bubble{max-width:88%;padding:11px 14px;font-size:13.5px;line-height:1.7;border-radius:14px}
+.bubble.user{align-self:flex-end;background:var(--tint-soft);color:var(--ember-deep);border-bottom-right-radius:4px}
+.bubble.agent{align-self:flex-start;background:var(--card-2);color:var(--text);border-bottom-left-radius:4px}
+.bubble.agent > span{display:block}
+.bubble.agent > span.ctx-cards{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0}
+.ctx{font-family:var(--mono);font-size:11px;color:var(--ember-deep);background:var(--bg-elev);
+  border:1px solid var(--line);border-left:3px solid var(--ember);border-radius:6px;padding:3px 8px}
+.typing{display:inline-flex;gap:5px;margin-top:10px;padding:4px 2px}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--ember);opacity:.35;
+  animation:typing 1.2s ease-in-out infinite}
+.typing i:nth-child(2){animation-delay:.18s}
+.typing i:nth-child(3){animation-delay:.36s}
+@keyframes typing{0%,60%,100%{opacity:.35;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+.chat-input{display:flex;gap:10px;padding:12px;border-top:1px solid var(--line);background:var(--card-2)}
+.chat-field{position:relative;flex:1;min-width:0;display:flex}
+.input-hint{position:absolute;left:13px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:7px;
+  pointer-events:none;color:var(--t3);font-size:13.5px;white-space:nowrap;transition:opacity .15s}
+.input-hint .skill-tag{color:var(--ember);font-weight:600}
+.chat-field input:focus~.input-hint,.chat-field input:not(:placeholder-shown)~.input-hint{opacity:0}
+.chat-input input{flex:1;min-width:0;background:var(--bg-elev);border:1px solid var(--line-strong);
+  border-radius:999px;padding:9px 16px;font-size:13.5px;color:var(--text);outline:0;font-family:var(--sans)}
+.chat-input input:focus{border-color:var(--ember);box-shadow:0 0 0 3px var(--focus-ring)}
+.chat-send{display:inline-flex;align-items:center;gap:6px;background:var(--ember);color:#fff;border:0;
+  border-radius:999px;padding:9px 16px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:var(--sans)}
+.chat-send svg{width:14px;height:14px}
+.chat-send:hover{background:var(--ember-soft)}
+
+/* ---------- 数据带 ---------- */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:22px 20px}
+.stat .v{font-family:var(--mono);font-size:30px;font-weight:700;letter-spacing:-.02em;
+  color:var(--ember)}
+.stat .k{color:var(--text-2);font-size:13.5px;margin-top:6px}
+
+/* ---------- 卡片网格 ---------- */
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:24px;display:flex;flex-direction:column;gap:10px;box-shadow:0 1px 2px rgba(15,23,42,.04);
+  transition:border-color .16s,transform .16s,box-shadow .16s}
+.card:hover{border-color:var(--line-strong);transform:translateY(-2px);box-shadow:0 4px 6px rgba(15,23,42,.06)}
+.card .card-head{display:flex;align-items:center;gap:12px}
+.card .card-head h3{margin:0}
+.card .card-ic{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;
+  justify-content:center;background:var(--tint-bg);color:var(--ember-soft);
+  border:1px solid var(--tint-line)}
+.card .card-ic svg{width:20px;height:20px}
+.card h3{margin:2px 0 0;font-size:17px;font-weight:650}
+.card p{margin:0;color:var(--text-2);font-size:14px;line-height:1.6}
+.card .card-link{margin-top:auto;font-size:13.5px;color:var(--link);display:inline-flex;
+  align-items:center;gap:6px}
+.card .card-link svg{width:14px;height:14px}
+.card .tagline{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+.tag{font-family:var(--mono);font-size:11.5px;color:var(--text-2);border:1px solid var(--line-strong);
+  border-radius:999px;padding:2px 10px}
+.tag.ember{color:var(--ember-deep);border-color:var(--tint-edge)}
+.tag.green{color:#15803D;border-color:#86EFAC}
+
+/* ---------- 痛点 / 对比 ---------- */
+.pain{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.pain .card{background:var(--card-2)}
+.pain .num-badge{font-family:var(--mono);color:var(--danger);font-size:13px;letter-spacing:.1em}
+.answer-strip{margin-top:18px;border:1px dashed var(--tint-edge);border-radius:var(--radius);
+  padding:18px 22px;color:var(--text-2);font-size:15px;background:var(--tint-bg)}
+.answer-strip strong{color:var(--text)}
+
+.cmp{width:100%;border-collapse:collapse;font-size:14.5px;border:1px solid var(--line);
+  border-radius:var(--radius);overflow:hidden}
+.cmp th,.cmp td{padding:13px 18px;text-align:left;border-bottom:1px solid var(--line);
+  vertical-align:top}
+.cmp thead th{background:var(--bg-elev);color:var(--text);font-size:13.5px;
+  font-family:var(--mono);letter-spacing:.05em}
+.cmp thead th.col-fenix{color:var(--ember-soft)}
+.cmp td:first-child{color:var(--text);white-space:nowrap;font-weight:600}
+.cmp td{color:var(--text-2)}
+.cmp td.col-fenix{color:var(--text);background:var(--tint-bg)}
+.cmp tr:last-child td{border-bottom:0}
+.cmp .yes{color:var(--verified)}
+.cmp .no{color:var(--danger)}
+
+/* ---------- 循环图 ---------- */
+.loop-diagram{display:grid;grid-template-columns:repeat(13,auto);align-items:stretch;
+  justify-content:center;gap:0}
+.loop-node{background:var(--card);border:1px solid var(--line-strong);border-radius:10px;
+  padding:12px 13px;min-width:0;text-align:center}
+.loop-node .t{font-weight:650;font-size:13.5px;white-space:nowrap}
+.loop-node .d{font-family:var(--mono);font-size:10.5px;color:var(--text-3);margin-top:4px;white-space:nowrap}
+.loop-node.hl{border-color:var(--term-ember);background:var(--tint-bg)}
+.loop-node.gate{border-color:rgba(34,197,94,.5)}
+.loop-arrow{display:flex;align-items:center;color:var(--text-3);padding:0 6px}
+.loop-arrow svg{width:20px;height:20px}
+.loop-back{margin-top:16px;text-align:center;font-family:var(--mono);font-size:12.5px;
+  color:var(--warn);display:flex;align-items:center;justify-content:center;gap:8px}
+.loop-back svg{width:16px;height:16px}
+
+/* ---------- 状态机 chips ---------- */
+.state-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.st{font-family:var(--mono);font-size:12.5px;padding:5px 12px;border-radius:999px;
+  border:1px solid var(--line-strong);color:var(--text-2);background:var(--card)}
+.st.done{border-color:rgba(34,197,94,.5);color:var(--verified)}
+.st.hl{border-color:var(--hl-edge);color:var(--ember-soft)}
+.st-risk{border-color:rgba(245,158,11,.5);color:var(--warn)}
+.state-sep{color:var(--text-3);font-size:13px}
+
+/* ---------- 架构分层 ---------- */
+.arch{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.arch-col{background:var(--card-2);border:1px solid var(--line);border-radius:var(--radius);
+  padding:20px;display:flex;flex-direction:column;gap:10px}
+.arch-col h4{margin:0;font-size:13px;font-family:var(--mono);letter-spacing:.14em;
+  color:var(--ember-soft);text-transform:uppercase}
+.arch-item{border:1px solid var(--line);border-radius:8px;padding:10px 14px;
+  background:var(--card);font-size:13.5px;color:var(--text-2)}
+.arch-item b{color:var(--text);font-weight:600;display:block;font-size:14px;margin-bottom:2px}
+
+/* ---------- 文档页 ---------- */
+.doc-search{display:flex;align-items:center;gap:12px;background:var(--card);
+  border:1px solid var(--line-strong);border-radius:12px;padding:14px 18px;max-width:720px}
+.doc-search svg{width:20px;height:20px;color:var(--text-3);flex:none}
+.doc-search input{flex:1;background:transparent;border:0;outline:0;color:var(--text);
+  font-size:15.5px;font-family:var(--sans)}
+.doc-search input::placeholder{color:var(--text-3)}
+.doc-search kbd{font-family:var(--mono);font-size:11.5px;color:var(--text-3);
+  border:1px solid var(--line-strong);border-radius:6px;padding:3px 8px;white-space:nowrap}
+.path-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:56px}
+.path-card{position:relative;background:var(--card-2);border:1px solid var(--line);
+  border-radius:var(--radius);padding:22px}
+.path-card .step{font-family:var(--mono);font-size:12px;color:var(--ember-soft);letter-spacing:.18em}
+.path-card h3{margin:8px 0 6px;font-size:17px}
+.path-card p{margin:0;color:var(--text-2);font-size:14px}
+.card-featured{grid-column:1/-1;display:grid;grid-template-columns:1.05fr .95fr;gap:26px;align-items:start}
+.card-featured .card-body{display:flex;flex-direction:column;gap:10px;min-width:0}
+.card-shot{margin:0;border:1px solid var(--line-strong);border-radius:12px;overflow:hidden;box-shadow:0 6px 18px rgba(15,23,42,.10);background:var(--card)}
+.card-shot img{width:100%;display:block;aspect-ratio:16/9;object-fit:cover;object-position:top left}
+.card-shot figcaption{font-family:var(--mono);font-size:11px;color:var(--text-3);padding:7px 12px;border-top:1px solid var(--line);background:var(--card-2)}
+@media(max-width:920px){.card-featured{grid-template-columns:1fr}}
+.card-featured h3{white-space:nowrap}
+.card-shot img{cursor:zoom-in}
+.caps-grid{grid-template-columns:repeat(auto-fit,minmax(520px,1fr));grid-auto-flow:dense}
+.caps-grid > .card:not(.card-featured){min-width:0}
+/* mode 两卡：上下堆叠各占整行，icon+标题同行 */
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.mode-grid .card .card-head{margin-bottom:10px}
+.mode-grid .card p{max-width:75ch;margin-bottom:14px}
+
+.lc-figure{margin:26px 0 0;border:1px solid var(--line-strong);border-radius:16px;background:var(--card);box-shadow:0 6px 18px rgba(15,23,42,.08);overflow:hidden}
+.lc-figure svg{display:block;width:92%;height:auto;margin:0 auto}
+.lc-figure figcaption{font-family:var(--mono);font-size:11px;color:var(--text-3);padding:8px 14px;border-top:1px solid var(--line);background:var(--card-2)}
+.lb{position:fixed;inset:0;z-index:300;background:rgba(11,17,32,.92);display:flex;align-items:center;justify-content:center;cursor:zoom-out;padding:4vh 4vw}
+.lb img{max-width:92vw;max-height:88vh;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5);background:#fff}
+.lb-hint{position:absolute;bottom:3vh;left:0;right:0;text-align:center;color:#cbd5e1;font-family:var(--mono);font-size:12px}
+.hero-split{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+.hero-vis{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hv-card{display:flex;flex-direction:column;gap:6px;background:var(--card);border:1px solid var(--line);
+  border-radius:12px;padding:16px 18px;text-decoration:none;transition:border-color .16s,transform .16s}
+.hv-card:hover{border-color:var(--ember);transform:translateY(-2px)}
+.hv-ic{width:30px;height:30px;border-radius:8px;background:var(--tint-bg);color:var(--ember);
+  display:inline-flex;align-items:center;justify-content:center}
+.hv-head{display:flex;align-items:center;gap:10px}
+.hv-d{font-size:12.5px;color:var(--text-2);line-height:1.5}
+.hv-t{font-weight:650;font-size:14.5px;color:var(--text)}
+.hv-n{font-family:var(--mono);font-size:11.5px;color:var(--text-3)}
+@media(max-width:920px){.hero-split{grid-template-columns:1fr}
+  .loop-diagram{grid-template-columns:repeat(7,auto);row-gap:12px;justify-content:center}}
+.grp-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin:0 0 18px}
+.grp-head h3{display:flex;align-items:center;gap:10px;font-size:16px;margin:0}
+.grp-lede{color:var(--text-2);font-size:14px}
+.doc-group{margin-bottom:44px}
+.doc-group h3{display:flex;align-items:center;gap:10px;font-size:16px;margin:0 0 14px}
+.grp-head .cnt{font-family:var(--mono);font-size:12px;color:var(--text-3);
+  border:1px solid var(--line-strong);border-radius:999px;padding:1px 9px;white-space:nowrap}
+.doc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.doc-card{display:block;background:var(--card);border:1px solid var(--line);
+  border-radius:9px;padding:16px 18px;color:var(--text);
+  transition:border-color .16s,transform .16s}
+.doc-card:hover{border-color:var(--line-strong);transform:translateY(-2px);text-decoration:none}
+.doc-card .no{font-family:var(--mono);font-size:11.5px;color:var(--text-3)}
+.doc-card .tt{font-weight:650;font-size:14.5px;margin:3px 0 4px}
+.doc-card .ds{color:var(--text-2);font-size:13px;line-height:1.55}
+
+/* ---------- 社区页 ---------- */
+.gh-card{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;align-items:stretch}
+.gh-main{background:var(--card);border:1px solid var(--line-strong);border-radius:var(--radius);
+  padding:26px}
+.gh-main .repo{display:flex;align-items:center;gap:12px;font-family:var(--mono);
+  font-size:17px;font-weight:600}
+.gh-main .repo svg{width:22px;height:22px;color:var(--text-2)}
+.gh-stats{display:flex;gap:26px;margin:18px 0}
+.gh-stats .s .v{font-family:var(--mono);font-size:22px;font-weight:700}
+.gh-stats .s .k{font-size:12.5px;color:var(--text-2)}
+.gh-side{display:flex;flex-direction:column;gap:12px}
+.mini-card{background:var(--card-2);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px;display:flex;gap:12px;align-items:flex-start}
+.mini-card .card-ic{flex:none;width:34px;height:34px;border-radius:9px;background:var(--tint-bg);
+  color:var(--ember-soft);display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--tint-line)}
+.mini-card .card-ic svg{width:17px;height:17px}
+.mini-card h4{margin:0 0 3px;font-size:14.5px}
+.mini-card p{margin:0;color:var(--text-2);font-size:13px}
+.chan-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.roadmap-item{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--line)}
+.roadmap-item:last-child{border-bottom:0}
+.roadmap-item .ver{font-family:var(--mono);font-size:13px;color:var(--ember-soft);
+  min-width:86px;padding-top:2px}
+.roadmap-item .bd h4{margin:0 0 3px;font-size:14.5px;font-weight:600}
+.roadmap-item .bd p{margin:0;color:var(--text-2);font-size:13.5px}
+
+/* ---------- CTA 带 ---------- */
+.cta-band{border-radius:var(--radius);padding:44px 40px;margin-top:28px;
+  background:linear-gradient(180deg,var(--tint-bg),#FFFFFF)}
+.cta-band h2{margin:0 0 10px;font-size:26px}
+.cta-band p{margin:0 0 24px;color:var(--text-2);font-size:15.5px}
+.cta-band .hero-ctas{margin:0}
+
+/* ---------- 页脚 ---------- */
+.site-footer{border-top:1px solid var(--line);background:var(--bg-elev);padding:56px 0 32px;
+  margin-top:0}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr;gap:32px}
+.foot-brand p{color:var(--text-2);font-size:13.5px;max-width:260px;margin:12px 0 0}
+.foot-col h4{font-size:13px;font-family:var(--mono);letter-spacing:.16em;color:var(--text-3);
+  text-transform:uppercase;margin:0 0 14px}
+.foot-col a{display:block;color:var(--text-2);font-size:14px;padding:5px 0}
+.ft-disabled{display:block;color:var(--text-3);font-size:14px;padding:5px 0;cursor:not-allowed}
+.foot-col a:hover{color:var(--text)}
+.foot-bottom{margin-top:44px;padding-top:22px;border-top:1px solid var(--line);
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  color:var(--text-3);font-size:13px}
+
+/* ---------- 响应式 ---------- */
+@media (max-width:1024px){
+  .hero-grid{grid-template-columns:1fr;gap:40px}
+  .hero h1{font-size:40px}
+  .grid-4{grid-template-columns:repeat(2,1fr)}
+  .stats{grid-template-columns:repeat(3,1fr)}
+  .foot-grid{grid-template-columns:1fr 1fr 1fr}
+  .main-nav{display:none}
+  .nav-burger{display:inline-flex}
+  .mobile-nav{display:none;position:fixed;top:var(--header-h);left:0;right:0;z-index:99;
+    background:var(--bg-elev);border-bottom:1px solid var(--line);padding:12px 24px 18px}
+  .mobile-nav.open{display:block}
+  .mobile-nav a{display:block;padding:12px 4px;color:var(--text-2);font-size:16px;
+    border-bottom:1px solid var(--line)}
+  .mobile-nav a:last-child{border-bottom:0}
+}
+@media (max-width:768px){
+  .section{padding:64px 0}
+  .hero{padding:64px 0 48px}
+  .hero h1{font-size:33px}
+  h2.sec-title{font-size:26px}
+  .grid-3,.pain,.arch,.path-row{grid-template-columns:1fr}
+  .caps-grid{grid-template-columns:1fr}
+  .mode-grid{grid-template-columns:1fr}
+  .grid-4,.doc-grid,.chan-grid{grid-template-columns:repeat(2,1fr)}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .gh-card{grid-template-columns:1fr}
+  .cmp{font-size:13px}
+  .cmp th,.cmp td{padding:10px 10px}
+  .header-actions .btn{display:none}
+}
+@media (max-width:480px){
+  .grid-4,.doc-grid,.chan-grid,.stats{grid-template-columns:1fr}
+  .cta-band{padding:30px 22px}
+  .foot-grid{grid-template-columns:1fr 1fr}
+}
+
+/* ---------- palette dock & themes ---------- */
+.pal-dock{position:fixed;left:16px;bottom:16px;z-index:80;display:flex;align-items:center;gap:8px;
+  background:var(--bg-elev);border:1px solid var(--line);border-radius:999px;padding:7px 12px;
+  box-shadow:0 6px 18px rgba(17,24,39,.10)}
+.pal-dock .pal-cap{font-size:11px;color:var(--text-3);margin-right:2px}
+.pal-dot{width:18px;height:18px;border-radius:50%;border:2px solid transparent;padding:0;cursor:pointer;
+  appearance:none;background-clip:padding-box;flex:none}
+.pal-dot.on{border-color:var(--text);box-shadow:inset 0 0 0 2px var(--bg-elev)}
+.pal-dot.p-ember{background:linear-gradient(120deg,#EA580C,#F97316)}
+.pal-dot.p-violet{background:linear-gradient(120deg,#7C3AED,#8B5CF6)}
+.pal-dot.p-orchid{background:linear-gradient(120deg,#9C2F81,#B8409A)}
+.pal-dot.p-royal{background:linear-gradient(120deg,#5B21B6,#6D28D9)}
+.pal-dot.p-aurora{background:linear-gradient(120deg,#0891B2,#8B5CF6)}
+.pal-dot.p-orchid-aurora{background:linear-gradient(135deg,#B8409A 0%,#8B5CF6 50%,#0891B2 100%)}
+body[data-palette="violet"]{--ember:#8B5CF6;--ember-soft:#7C3AED;--ember-deep:#6D28D9;
+  --tint-bg:#F5F3FF;--tint-soft:#EDE9FE;--tint-line:#DDD6FE;--tint-edge:#C4B5FD;
+  --focus-ring:rgba(139,92,246,.15);--glow-a:rgba(139,92,246,.08);--glow-b:rgba(196,181,253,.07);
+  --hl-edge:rgba(139,92,246,.55);--term-ember:#A78BFA;
+  --grad-brand:linear-gradient(120deg,#7C3AED,#8B5CF6);--link:#7C3AED}
+body[data-palette="orchid"]{--ember:#B8409A;--ember-soft:#9C2F81;--ember-deep:#83286B;
+  --tint-bg:#FDF2F8;--tint-soft:#FCE7F3;--tint-line:#FBCFE8;--tint-edge:#F9A8D4;
+  --focus-ring:rgba(184,64,154,.15);--glow-a:rgba(184,64,154,.08);--glow-b:rgba(249,168,212,.07);
+  --hl-edge:rgba(184,64,154,.55);--term-ember:#DA8BC4;
+  --grad-brand:linear-gradient(120deg,#9C2F81,#B8409A);--link:#9C2F81}
+body[data-palette="royal"]{--ember:#6D28D9;--ember-soft:#5B21B6;--ember-deep:#4C1D95;
+  --tint-bg:#F5F3FF;--tint-soft:#EDE9FE;--tint-line:#C4B5FD;--tint-edge:#A78BFA;
+  --focus-ring:rgba(109,40,217,.15);--glow-a:rgba(109,40,217,.08);--glow-b:rgba(167,139,250,.07);
+  --hl-edge:rgba(109,40,217,.55);--term-ember:#C4B5FD;
+  --grad-brand:linear-gradient(120deg,#5B21B6,#7C3AED);--link:#6D28D9}
+body[data-palette="aurora"]{--ember:#8B5CF6;--ember-soft:#7C3AED;--ember-deep:#6D28D9;
+  --tint-bg:#F5F3FF;--tint-soft:#EDE9FE;--tint-line:#DDD6FE;--tint-edge:#C4B5FD;
+  --focus-ring:rgba(139,92,246,.15);--glow-a:rgba(8,145,178,.08);--glow-b:rgba(139,92,246,.07);
+  --hl-edge:rgba(8,145,178,.55);--term-ember:#67E8F9;
+  --grad-brand:linear-gradient(120deg,#0891B2,#8B5CF6);--link:#0E7490}
+body[data-palette="orchid-aurora"]{--ember:#B8409A;--ember-soft:#9C2F81;--ember-deep:#83286B;
+  --tint-bg:#FDF2F8;--tint-soft:#FCE7F3;--tint-line:#FBCFE8;--tint-edge:#F9A8D4;
+  --focus-ring:rgba(184,64,154,.15);--glow-a:rgba(8,145,178,.08);--glow-b:rgba(184,64,154,.07);
+  --hl-edge:rgba(184,64,154,.55);--term-ember:#E879C8;
+  --grad-brand:linear-gradient(120deg,#0891B2 0%,#8B5CF6 48%,#B8409A 100%);--link:#0E7490}
+body[data-palette="ember"]{--ember:#F97316;--ember-soft:#EA580C;--ember-deep:#C2410C;
+  --tint-bg:#FFF7ED;--tint-soft:#FFEDD5;--tint-line:#FED7AA;--tint-edge:#FDBA74;
+  --focus-ring:rgba(249,115,22,.15);--glow-a:rgba(249,115,22,.08);--glow-b:rgba(251,191,36,.07);
+  --hl-edge:rgba(249,115,22,.55);--term-ember:#FB923C;
+  --grad-brand:linear-gradient(120deg,#EA580C,#F97316);--link:#EA580C}
+@media (max-width:768px){.pal-dock{left:10px;bottom:10px;padding:5px 8px;gap:6px}
+  .pal-dock .pal-cap{display:none}.pal-dot{width:15px;height:15px}}
+</style>
+</head>
+<body data-palette="orchid-aurora">
+<a class="skip-link" href="#main" data-i18n="a11y.skip">跳到主内容</a>
+<div class="proto-banner" data-proto-id="home-proto-banner"><strong>仿样原型 · 视觉参照、无约束力</strong> ， 本原型为纯 HTML/CSS 仿样级（栈画像 unknown，纯静态站点无组件库），批准后仅作视觉参照；约束力由 SPEC 的 DESIGN.md 承载</div>
+<header class="site-header" data-proto-id="home-header">
+  <div class="header-in">
+    <a class="logo" href="index.html" data-proto-id="home-logo">
+      <span class="logo-mark"><img src="logo-64.png" alt=""></span><svg class="logo-lockup" width="124" height="38" viewBox="0 0 124 38" role="img" aria-label="Fenix Harness, The AI-Native SDLC"><text x="0" y="17" textLength="117.3" lengthAdjust="spacing" font-family="Montserrat,-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="12.5px" font-weight="600" letter-spacing="1px" fill="var(--text)">FENIX <tspan font-weight="500" fill="var(--text-2)">HARNESS</tspan></text><text x="0" y="30.5" textLength="117.3" lengthAdjust="spacing" font-family="Montserrat,-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="9px" font-weight="500" letter-spacing="2.2px" fill="var(--text-3)">THE AI-NATIVE SDLC</text></svg>
+    </a>
+    <nav class="main-nav" data-proto-id="home-nav" aria-label="主导航">
+      <a href="index.html" data-i18n="nav.home" class="active">首页</a>
+      <a href="index.html#quickstart" data-i18n="nav.quick">快速开始</a>
+      <a href="why.html" data-i18n="nav.why">使用场景</a>
+      <a href="capabilities.html" data-i18n="nav.capabilities">能力全景</a>
+      <a href="docs.html" data-i18n="nav.docs">文档</a>
+      <a href="community.html" data-i18n="nav.community">社区</a>
+    </nav>
+    <div class="header-actions">
+      <div class="lang-toggle" data-proto-id="nav-lang-toggle" role="group" aria-label="语言切换">
+        <button type="button" id="lang-zh" class="on">中文</button>
+        <button type="button" id="lang-en">EN</button>
+      </div>
+      <a class="gh-btn" href="https://github.com/fenixsoft/fenixd" aria-label="GitHub" data-proto-id="home-github-btn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path fill="currentColor" stroke="none" d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-.99-.78-.015-.765.915.015 1.545.84 1.76 1.185.945 1.62 2.445 1.17 3.03.885.09-.66.375-1.17.675-1.44-2.67-.3-5.46-1.335-5.46-5.925 0-1.17.42-2.13 1.11-2.88-.12-.3-.48-1.5.105-3.12 0 0 .9-.285 2.955 1.11.87-.24 1.77-.36 2.685-.36.915 0 1.83.12 2.685.36 2.055-1.395 2.955-1.11 2.955-1.11.585 1.62.225 2.82.105 3.12.69.75 1.11 1.71 1.11 2.88 0 4.6-2.79 5.625-5.46 5.925.39.33.72 1.005.72 2.025 0 1.44-.015 2.61-.015 2.955 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg></a>
+
+      <button type="button" class="icon-btn nav-burger" id="nav-burger" aria-label="打开菜单" aria-expanded="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></button>
+    </div>
+  </div>
+</header>
+<nav class="mobile-nav" id="mobile-nav" data-proto-id="home-mobile-nav" aria-label="移动端导航">
+  <a href="index.html" data-i18n="nav.home">首页</a>
+  <a href="index.html#quickstart" data-i18n="nav.quick">快速开始</a>
+  <a href="why.html" data-i18n="nav.why">使用场景</a>
+  <a href="capabilities.html" data-i18n="nav.capabilities">能力全景</a>
+  <a href="docs.html" data-i18n="nav.docs">文档</a>
+  <a href="community.html" data-i18n="nav.community">社区</a>
+</nav>
+<main id="main">
+
+<section class="hero" data-proto-id="home-hero">
+  <div class="wrap hero-grid">
+    <div data-proto-id="home-hero-copy">
+      <p class="eyebrow" data-i18n="hero.eyebrow">FENIX AI-NATIVE SDLC DEVELOPMENT</p>
+      <h1 data-i18n="hero.h1">…</h1>
+      <p class="lede" data-i18n="hero.lede">…</p>
+      <div class="hero-ctas" data-proto-id="home-hero-ctas">
+        <a class="btn btn-ghost btn-lg" href="why.html" data-i18n="hero.cta1">什么是 Fenixd</a>
+        <a class="btn btn-primary btn-lg" href="#quickstart" data-i18n="hero.cta2">快速开始 <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </div>
+    <div class="chat" data-proto-id="home-hero-chat">
+      <div class="chat-head"><span class="chat-logo"><img src="logo-64.png" alt=""></span>
+        <span class="chat-title" data-i18n="chat.title">…</span></div>
+      <div class="chat-body">
+        <div class="bubble user" data-proto-id="home-chat-bubble-user"><span data-i18n="chat.u1">给用户中心加邮箱登录，要能禁用密码登录</span></div>
+        <div class="bubble agent" data-proto-id="home-chat-bubble-agent">
+          <span data-i18n="chat.a1">已澄清意图，生成完整 SPEC。</span>
+          <span class="ctx-cards" data-proto-id="home-chat-context">
+            <span class="ctx">SPEC ✓</span><span class="ctx">review ✓</span><span class="ctx">verify 6/6 ✓</span><span class="ctx">14 tasks</span>
+          </span>
+          <span data-i18n="chat.a2">评审通过 → daemon 拾取 → 独立 worktree 实现 14 个任务 → 零 LLM 验证 6 个场景全部通过。</span>
+          <span data-i18n="chat.a3">done：等你审批推送（唯一人工门禁）。</span>
+          <span class="typing" data-proto-id="home-chat-typing" aria-hidden="true"><i></i><i></i><i></i></span>
+        </div>
+      </div>
+      <div class="chat-input" data-proto-id="home-chat-input">
+        <div class="chat-field">
+          <input type="text" placeholder=" " aria-label="需求输入（示例）">
+          <span class="input-hint"><span class="skill-tag mono" data-i18n="chat.k1">/fenix-new</span><span data-i18n="chat.k2"> 说出你的下一个需求…</span></span>
+        </div>
+        <button type="button" class="chat-send"><span data-i18n="chat.send">发送</span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l16-8-6 16-2.5-6z"/><path d="M11.5 14L20 4"/></svg></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" data-proto-id="home-capabilities">
+  <div class="wrap">
+    <p class="eyebrow" data-i18n="cap.eyebrow">WHAT FENIXD CAN DO</p>
+    <h2 class="sec-title" data-i18n="cap.title">…</h2>
+    <p class="sec-lede" style="max-width:none" data-i18n="cap.lede">…</p>
+    <div class="grid-4" data-proto-id="home-cap-grid">
+<article class="card" data-proto-id="home-cap-card-1">
+  <div class="card-head"><div class="card-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></div><h3 data-i18n="cap.1.t">…</h3></div>
+  <p data-i18n="cap.1.d">…</p>
+  <a class="card-link" href="capabilities.html" data-i18n="cap.more">了解详情 <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+</article><article class="card" data-proto-id="home-cap-card-2">
+  <div class="card-head"><div class="card-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg></div><h3 data-i18n="cap.2.t">…</h3></div>
+  <p data-i18n="cap.2.d">…</p>
+  <a class="card-link" href="capabilities.html" data-i18n="cap.more">了解详情 <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+</article><article class="card" data-proto-id="home-cap-card-3">
+  <div class="card-head"><div class="card-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8-7 9-4-1-7-4.6-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div><h3 data-i18n="cap.3.t">…</h3></div>
+  <p data-i18n="cap.3.d">…</p>
+  <a class="card-link" href="capabilities.html" data-i18n="cap.more">了解详情 <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+</article><article class="card" data-proto-id="home-cap-card-4">
+  <div class="card-head"><div class="card-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h14v18H6a2 2 0 0 0-2 2z"/><path d="M4 19a2 2 0 0 1 2-2h14"/></svg></div><h3 data-i18n="cap.4.t">…</h3></div>
+  <p data-i18n="cap.4.d">…</p>
+  <a class="card-link" href="capabilities.html" data-i18n="cap.more">了解详情 <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+</article><article class="card" data-proto-id="home-cap-card-5">
+  <div class="card-head"><div class="card-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></div><h3 data-i18n="cap.5.t">…</h3></div>
+  <p data-i18n="cap.5.d">…</p>
+  <a class="card-link" href="capabilities.html" data-i18n="cap.more">了解详情 <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+</article><article class="card" data-proto-id="home-cap-card-6">
+  <div class="card-head"><div class="card-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/></svg></div><h3 data-i18n="cap.6.t">…</h3></div>
+  <p data-i18n="cap.6.d">…</p>
+  <a class="card-link" href="capabilities.html" data-i18n="cap.more">了解详情 <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+</article><article class="card" data-proto-id="home-cap-card-7">
+  <div class="card-head"><div class="card-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4.5 4.5 0 0 0-6 6L4 17v3h3l4.7-4.7a4.5 4.5 0 0 0 6-6L14 12l-2-2z"/></svg></div><h3 data-i18n="cap.7.t">…</h3></div>
+  <p data-i18n="cap.7.d">…</p>
+  <a class="card-link" href="capabilities.html" data-i18n="cap.more">了解详情 <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+</article><article class="card" data-proto-id="home-cap-card-8">
+  <div class="card-head"><div class="card-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><h3 data-i18n="cap.8.t">…</h3></div>
+  <p data-i18n="cap.8.d">…</p>
+  <a class="card-link" href="capabilities.html" data-i18n="cap.more">了解详情 <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+</article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="quickstart" data-proto-id="home-quickstart">
+  <div class="wrap">
+    <p class="eyebrow" data-i18n="q.eyebrow">QUICKSTART</p>
+    <h2 class="sec-title" data-i18n="q.title">…</h2>
+    <p class="sec-lede" data-i18n="q.lede">…</p>
+    <div class="grid-3" data-proto-id="home-quickstart-steps">
+      <article class="card" data-proto-id="home-q-step-1">
+        <div class="card-head"><div class="card-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7l5 5-5 5M12 17h7"/></svg></div><h3 data-i18n="q.s1.t">…</h3></div>
+        <p data-i18n="q.s1.d">…</p>
+        <div class="term-body mono" style="border:1px solid var(--line);border-radius:8px;background:var(--term-bg);padding:10px 14px"><span class="t-p">$</span> <span class="t-c">curl -fsSL https://fenixd.example/install.sh | bash</span></div>
+      </article>
+      <article class="card" data-proto-id="home-q-step-2">
+        <div class="card-head"><div class="card-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></div><h3 data-i18n="q.s2.t">…</h3></div>
+        <p data-i18n="q.s2.d">…</p>
+        <div class="term-body mono" style="border:1px solid var(--line);border-radius:8px;background:var(--term-bg);padding:10px 14px"><span class="t-p">$</span> <span class="t-c">fenix-new</span> <span class="t-o" data-i18n="q.s2.code">"一句话需求"</span></div>
+      </article>
+      <article class="card" data-proto-id="home-q-step-3">
+        <div class="card-head"><div class="card-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15c-2 0-3-1-3-1s.5-6.5 4-10c2.5 2.5 3.5 6.5 2 11z"/><path d="M9 14l-3 3 1.5.5.5 1.5 3-3M15.5 12.5L18 15l-1.5.5-.5 1.5"/></svg></div><h3 data-i18n="q.s3.t">…</h3></div>
+        <p data-i18n="q.s3.d">…</p>
+        <div class="term-body mono" style="border:1px solid var(--line);border-radius:8px;background:var(--term-bg);padding:10px 14px"><span class="t-ok">✓ done</span> <span class="t-dim" data-i18n="q.s3.code">→ /fenix-approve 审批推送</span></div>
+      </article>
+    </div>
+    <p class="sec-lede" style="max-width:none;margin-top:56px" data-i18n="ev.lede">…</p>
+    <div class="grid-3" data-proto-id="home-evidence">
+      <figure class="card-shot" data-proto-id="home-ev-shot-1">
+        <img src="assets/dash-project-specs.png" alt="">
+        <figcaption data-i18n="ev.c1">…</figcaption>
+      </figure>
+      <figure class="card-shot" data-proto-id="home-ev-shot-2">
+        <img src="assets/dash-command.png" alt="">
+        <figcaption data-i18n="ev.c2">…</figcaption>
+      </figure>
+      <figure class="card-shot" data-proto-id="home-ev-shot-3">
+        <img src="assets/dash-activities.png" alt="">
+        <figcaption data-i18n="ev.c3">…</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="section" data-proto-id="home-guides">
+  <div class="wrap">
+    <p class="eyebrow" data-i18n="g.eyebrow">DOCS PREVIEW</p>
+    <h2 class="sec-title" data-i18n="g.title">…</h2>
+    <p class="sec-lede" data-i18n="g.lede">…</p>
+    <div class="grid-4" data-proto-id="home-doc-grid">
+<a class="doc-card" href="docs.html" data-proto-id="home-doc-card-01">
+  <span class="no mono">01 · HELP</span>
+  <span class="tt" data-i18n="g.1.t">…</span>
+  <span class="ds" data-i18n="g.1.d">…</span>
+</a><a class="doc-card" href="docs.html" data-proto-id="home-doc-card-02">
+  <span class="no mono">02 · HELP</span>
+  <span class="tt" data-i18n="g.2.t">…</span>
+  <span class="ds" data-i18n="g.2.d">…</span>
+</a><a class="doc-card" href="docs.html" data-proto-id="home-doc-card-03">
+  <span class="no mono">03 · HELP</span>
+  <span class="tt" data-i18n="g.3.t">…</span>
+  <span class="ds" data-i18n="g.3.d">…</span>
+</a><a class="doc-card" href="docs.html" data-proto-id="home-doc-card-04">
+  <span class="no mono">04 · HELP</span>
+  <span class="tt" data-i18n="g.4.t">…</span>
+  <span class="ds" data-i18n="g.4.d">…</span>
+</a>
+    </div>
+  </div>
+</section>
+
+<section class="section" data-proto-id="home-stats">
+  <div class="wrap">
+    <h2 class="sec-title" data-i18n="stats.title">…</h2>
+    <p class="sec-lede" data-i18n="stats.lede">…</p>
+    <div class="stats" data-proto-id="home-stats-grid">
+      <div class="stat"><div class="v num">500+</div><div class="k" data-i18n="stat.1">…</div></div>
+      <div class="stat"><div class="v num">12</div><div class="k" data-i18n="stat.2">…</div></div>
+      <div class="stat"><div class="v num">3</div><div class="k" data-i18n="stat.3">…</div></div>
+      <div class="stat"><div class="v num">11</div><div class="k" data-i18n="stat.4">…</div></div>
+      <div class="stat"><div class="v num">0</div><div class="k" data-i18n="stat.5">…</div></div>
+    </div>
+    <div class="cta-band" data-proto-id="home-dogfood-band">
+      <h2 data-i18n="dog.title">…</h2>
+      <p data-i18n="dog.lede">…</p>
+      <div class="hero-ctas">
+        <a class="btn btn-ghost" href="why.html" data-i18n="dog.cta1">看看它是怎么运转的</a>
+        <a class="btn btn-primary" href="https://github.com/fenixsoft/fenixd" data-i18n="dog.cta2">访问 GitHub<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path fill="currentColor" stroke="none" d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-.99-.78-.015-.765.915.015 1.545.84 1.76 1.185.945 1.62 2.445 1.17 3.03.885.09-.66.375-1.17.675-1.44-2.67-.3-5.46-1.335-5.46-5.925 0-1.17.42-2.13 1.11-2.88-.12-.3-.48-1.5.105-3.12 0 0 .9-.285 2.955 1.11.87-.24 1.77-.36 2.685-.36.915 0 1.83.12 2.685.36 2.055-1.395 2.955-1.11 2.955-1.11.585 1.62.225 2.82.105 3.12.69.75 1.11 1.71 1.11 2.88 0 4.6-2.79 5.625-5.46 5.925.39.33.72 1.005.72 2.025 0 1.44-.015 2.61-.015 2.955 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+</main>
+<footer class="site-footer" data-proto-id="home-footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="logo" href="index.html"><span class="logo-mark"><img src="logo-64.png" alt=""></span><span>Fenixd</span></a>
+        <p data-i18n="footer.brand">Fenix Loop Engineering Framework，把「写软件」编排成受控闭环：实现、独立验证、打回修复，质量由循环收敛保证。</p>
+      </div>
+      <div class="foot-col" data-proto-id="home-footer-product">
+        <h4 data-i18n="footer.product">产品</h4>
+        <a href="why.html" data-i18n="footer.p1">为什么是 Fenixd</a>
+        <a href="capabilities.html" data-i18n="footer.p2">能力全景</a>
+        <a href="https://github.com/fenixsoft/fenixd/releases" data-i18n="footer.p3">更新日志</a>
+        <span class="ft-disabled" data-i18n="footer.p4">路线图</span>
+      </div>
+      <div class="foot-col" data-proto-id="home-footer-docs">
+        <h4 data-i18n="footer.docs">文档</h4>
+        <a href="docs.html" data-i18n="footer.d1">快速上手</a>
+        <a href="docs.html" data-i18n="footer.d2">核心概念与架构</a>
+        <a href="docs.html" data-i18n="footer.d3">CLI 操作手册</a>
+        <a href="docs.html" data-i18n="footer.d4">FAQ 与故障排查</a>
+      </div>
+      <div class="foot-col" data-proto-id="home-footer-community">
+        <h4 data-i18n="footer.community">社区</h4>
+        <a href="https://github.com/fenixsoft/fenixd" data-i18n="footer.c1">GitHub</a>
+        <a href="https://github.com/fenixsoft/fenixd/discussions" data-i18n="footer.c2">Discussions</a>
+        <a href="https://github.com/fenixsoft/fenixd/issues" data-i18n="footer.c3">问题反馈</a>
+        <a href="https://github.com/fenixsoft/fenixd/blob/main/docs/help/14-contributing.md" data-i18n="footer.c4">贡献指南</a>
+      </div>
+      <div class="foot-col" data-proto-id="home-footer-about">
+        <h4 data-i18n="footer.about">关于</h4>
+        <a href="https://icyfenix.cn" data-i18n="footer.a1">博客</a>
+        <a href="mailto:icyfenix@gmail.com" data-i18n="footer.a2">联系</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span data-i18n="footer.legal">© 2026 Fenixd · Fenix Loop Engineering Framework</span>
+      <span class="mono" data-i18n="footer.dogfood">Fenixd 由 Fenixd 自动开发，本站亦然</span>
+    </div>
+  </div>
+</footer>
+<div class="pal-dock" data-proto-id="home-palette-dock" role="group" aria-label="配色方案切换（原型比选用）">
+  <span class="pal-cap">配色</span>
+  <button type="button" class="pal-dot p-ember" data-pal="ember" data-i18n-title="pal.ember" data-i18n-label="pal.ember" aria-label="余烬橙"></button>
+  <button type="button" class="pal-dot p-violet" data-pal="violet" data-i18n-title="pal.violet" data-i18n-label="pal.violet" aria-label="紫罗兰"></button>
+  <button type="button" class="pal-dot p-orchid" data-pal="orchid" data-i18n-title="pal.orchid" data-i18n-label="pal.orchid" aria-label="品红梅"></button>
+  <button type="button" class="pal-dot p-royal" data-pal="royal" data-i18n-title="pal.royal" data-i18n-label="pal.royal" aria-label="深靛紫"></button>
+  <button type="button" class="pal-dot p-aurora" data-pal="aurora" data-i18n-title="pal.aurora" data-i18n-label="pal.aurora" aria-label="极光紫青"></button>
+  <button type="button" class="pal-dot p-orchid-aurora on" data-pal="orchid-aurora" data-i18n-title="pal.orchid-aurora" data-i18n-label="pal.orchid-aurora" aria-label="品红极光"></button>
+</div>
+
+<script>
+window.PROTO_I18N = {"zh": {"a11y.skip": "跳到主内容", "nav.home": "首页", "nav.quick": "快速开始", "nav.why": "使用场景", "nav.capabilities": "能力全景", "nav.docs": "文档", "nav.community": "社区", "nav.cta": "快速开始", "footer.brand": "Fenix Loop Engineering Framework，把「写软件」编排成受控闭环：实现、独立验证、打回修复，质量由循环收敛保证。", "footer.product": "产品", "footer.p1": "为什么是 Fenixd", "footer.p2": "能力全景", "footer.p3": "更新日志", "footer.p4": "路线图", "footer.docs": "文档", "footer.d1": "快速上手", "footer.d2": "核心概念与架构", "footer.d3": "CLI 操作手册", "footer.d4": "FAQ 与故障排查", "footer.community": "社区", "footer.c1": "GitHub", "footer.c2": "Discussions", "footer.c3": "问题反馈", "footer.c4": "贡献指南", "footer.about": "关于", "footer.a1": "博客", "footer.a2": "联系", "footer.legal": "© 2026 Fenixd · Fenix Loop Engineering Framework", "footer.dogfood": "Fenixd 由 Fenixd 自动开发，本站亦然", "pal.ember": "余烬橙", "pal.violet": "紫罗兰", "pal.orchid": "品红梅", "pal.royal": "深靛紫", "pal.aurora": "极光紫青", "pal.orchid-aurora": "品红极光（当前默认 · 品红梅 × 极光紫青）", "title": "Fenixd · 让软件开发规格驱动、循环验证、自动交付", "hero.eyebrow": "FENIX AI-NATIVE SDLC DEVELOPMENT", "hero.h1": "AI Native 的软件开发<br><span class=\"grad-text\">规格驱动。循环验证。自动交付。</span>", "hero.lede": "Fenixd 是 Harness 中立的自动化软件开发循环框架，支持 Claude Code、DSH 等多种 Harness。它把自然语言需求沉淀为 SPEC，经「实现 → 独立验证 → 打回修复」的受控闭环，交付<strong>已实现、已验证、可上线</strong>的代码，全程无需人工介入，唯一的人工门禁是最终审批推送。", "hero.cta1": "什么是 Fenixd", "hero.cta2": "快速开始", "chat.title": "Fenixd, 一句话需求，对话式交付", "chat.u1": "给用户中心加邮箱登录，要能禁用密码登录", "chat.a1": "已澄清意图，完整 SPEC 已经生成：proposal、design、specs、tasks 四份俱全，建议执行模式 full。", "chat.a2": "评审通过后 daemon 自动拾取，在独立 worktree 里实现全部 14 个任务，循环验证跑完 6 个场景零 LLM 全部通过。", "chat.a3": "状态已到 done，自动交付只差最后一步：等你审批推送，这是全流程唯一的人工门禁。", "chat.k1": "/fenix-new", "chat.k2": "说出你的下一个需求…", "chat.send": "发送", "stats.title": "数字里的 Fenixd", "stats.lede": "Fenixd 自身的演进由 Fenixd 驱动，这些是本仓库的真实运转口径（原型页均为示例数据）。", "cap.eyebrow": "WHAT PROBLEM FENIXD SOLVES", "cap.title": "Fenixd 的设计意图", "cap.lede": "AI 让写代码快了十倍，也让软件熵增快了十倍。当生成速度超过理解与验证的速度，混乱开始加速累积：新功能不断上线，旧功能却在悄悄损坏。Fenixd 用四类机制对抗熵增，SPEC 驱动、循环验证、质量门禁、知识蒸馏，把约束从「口头指南」升级为机器执行的「硬闸门」。", "q.eyebrow": "QUICKSTART", "q.title": "三步接入，把循环跑起来", "q.lede": "无需数据库、无需常驻服务集群，全部状态落在仓库的普通文件上。", "ev.lede": "代码由 daemon 自动交付、循环验证；每一个 SPEC 的流转、每一次 Agent 的动作都在 Dashboard 上实时可见。", "ev.c1": "SPEC 流转：从一句话需求到审批推送，状态一目了然", "ev.c2": "Command Center：12 类 Agent 的实例、成功率与今日活动", "ev.c3": "活动流：谁在何时读了什么、改了什么、为什么决策", "g.eyebrow": "DOCS PREVIEW", "g.title": "从快速上手到深度治理", "g.lede": "12 篇专题 + 3 篇手册构成的帮助文档体系，与 Dashboard「帮助」菜单同源。", "dog.title": "Fenixd 由 Fenixd 开发", "dog.lede": "本仓库已全自动推进 500+ 个 SPEC（实现 → 验证 → 打回修复 → 推送），是这套框架最直接的实战验证，包括你正在看的这个官网。", "dog.cta1": "看看它是怎么运转的", "dog.cta2": "访问 GitHub", "cap.more": "了解详情 ", "stat.1": "个 SPEC 全自动推进（Fenixd 自身仓库）", "stat.2": "类 Agent 运行时角色", "stat.3": "步零信任验证流水线", "stat.4": "态显式状态机治理全程", "stat.5": "数据库依赖 · 文件即状态", "cap.1.t": "SPEC 驱动", "cap.1.d": "模糊的口头意图沉淀为结构化 SPEC（提案 / 设计 / 规格 / 任务），架构意图不再漂在聊天记录里，人与 AI 锚定同一份可审查契约。", "cap.2.t": "循环验证", "cap.2.d": "实现 → 独立验证 → 打回修复的受控闭环，预算与熔断约束轮次。偏差在环内被拉回，而不是跨提交累积成「代理熵」。", "cap.3.t": "质量门禁", "cap.3.d": "零 LLM 验证引擎逐断言执行（web / api / cli），二元裁决「通过 / 不通过」。不依赖模型自觉，把架构违规挡在合并之前。", "cap.4.t": "知识蒸馏", "cap.4.d": "每个 SPEC 的验收断言与架构决策回沉为仓库知识，规则库随每个迭代增强，专家经验从人脑与聊天记录蒸馏为机器可执行的约束。", "cap.5.t": "全局状态机", "cap.5.d": "11 态生命周期只允许合法转移。代理熵是跨提交的系统性漂移，恰好需要全局账本让它显形：任何时刻精确回答「走到哪、卡在哪」。", "cap.6.t": "隔离 Worktree", "cap.6.d": "每次实现跑在独立 git worktree 与分支，merge-back 冲突自愈，失控的变更永远污染不了主干。", "cap.7.t": "自愈熔断", "cap.7.d": "Administrator / Arbiter 自愈链自动处置困境；无法自愈时明确停靠 blocked 等人裁决，专业知识保留在循环之内。", "cap.8.t": "实时 Dashboard", "cap.8.d": "跨项目聚合每个 SPEC 的实时流转、日志与验证产物。熵增不可怕，不可见才可怕。", "q.s1.t": "① 接入 Fenixd", "q.s1.d": "一行脚本装好 daemon（systemd 常驻、supervisor 托管），Linux / Windows 双平台。", "q.s2.t": "② 一句话立项", "q.s2.d": "/fenix-new 说出想法，需求 Agent 澄清并生成完整 SPEC，按复杂度建议执行模式。", "q.s2.code": "\"一句话需求\"", "q.s3.code": "→ /fenix-approve 审批推送", "q.s3.t": "③ 等代码交付", "q.s3.d": "daemon 自动拾取 → 实现 → 验证 → done，你在唯一人工门禁处审批推送。", "g.1.t": "快速上手", "g.1.d": "从零到交付的端到端流程", "g.2.t": "核心概念与架构", "g.2.d": "闭环原理、12 类 Agent、执行模式", "g.3.t": "生命周期与状态机", "g.3.d": "11 状态全景、评审门禁、打回修复循环", "g.4.t": "CLI 操作手册", "g.4.d": "/fenix-* skill 逐个详解"}, "en": {"a11y.skip": "Skip to content", "nav.home": "Home", "nav.quick": "Quick Start", "nav.why": "Why Fenixd", "nav.capabilities": "Capabilities", "nav.docs": "Docs", "nav.community": "Community", "nav.cta": "Get Started", "footer.brand": "Fenix Loop Engineering Framework, software development as a controlled loop: implement, verify independently, bounce back and fix. Quality converges through the loop.", "footer.product": "Product", "footer.p1": "Why Fenixd", "footer.p2": "Capabilities", "footer.p3": "Changelog", "footer.p4": "Roadmap", "footer.docs": "Docs", "footer.d1": "Quick Start", "footer.d2": "Concepts &amp; Architecture", "footer.d3": "CLI Handbook", "footer.d4": "FAQ &amp; Troubleshooting", "footer.community": "Community", "footer.c1": "GitHub", "footer.c2": "Discussions", "footer.c3": "Report an Issue", "footer.c4": "Contributing", "footer.about": "About", "footer.a1": "Blog", "footer.a2": "Contact", "footer.legal": "© 2026 Fenixd · Fenix Loop Engineering Framework", "footer.dogfood": "Fenixd is developed by Fenixd itself, so is this site", "pal.ember": "Ember", "pal.violet": "Violet", "pal.orchid": "Orchid", "pal.royal": "Royal Purple", "pal.aurora": "Aurora Duo", "pal.orchid-aurora": "Orchid Aurora (current default · orchid × aurora)", "title": "Fenixd · Spec-driven. Loop-verified. Automated.", "hero.eyebrow": "FENIX AI-NATIVE SDLC DEVELOPMENT", "hero.h1": "AI-native software development,<br><span class=\"grad-text\">spec-driven. loop-verified. automated.</span>", "hero.lede": "Fenixd is a harness-neutral automated software development loop framework, supporting Claude Code, DSH and other harnesses. It distills natural-language requirements into SPECs and runs a controlled loop, <strong>implement → verify independently → bounce back and fix</strong>, delivering code that is implemented, verified and shippable. The only human gate is the final approval to push.", "hero.cta1": "What is Fenixd", "hero.cta2": "Get Started", "chat.title": "Fenixd, conversational delivery", "chat.u1": "Add email login to the user center, with password login disableable", "chat.a1": "Intent clarified, full SPEC generated: proposal · design · specs · tasks. Recommended mode: full.", "chat.a2": "After review, the daemon picks it up automatically and implements all 14 tasks in an isolated worktree; the loop-verified suite then passes all 6 scenarios with zero LLM calls.", "chat.a3": "The state is done; automated delivery needs one last step, your approval to push, the single human gate in the whole loop.", "chat.k1": "/fenix-new", "chat.k2": "Type your next requirement…", "chat.send": "Send", "stats.title": "Fenixd in numbers", "stats.lede": "Fenixd drives its own evolution, these numbers come from its own repository (all figures on this prototype page are sample data).", "cap.eyebrow": "WHAT PROBLEM FENIXD SOLVES", "cap.title": "The problem Fenixd solves", "cap.lede": "AI made code ten times faster to write, and software entropy ten times faster to accumulate. When generation outpaces comprehension and verification, chaos compounds: new features ship relentlessly while old ones quietly break. Fenixd fights back with four classes of mechanisms, SPEC-driven specs, verification loops, quality gates and knowledge distillation, upgrading constraints from spoken guidelines to machine-enforced hard gates.", "q.eyebrow": "QUICKSTART", "q.title": "Three steps to spin up the loop", "q.lede": "No database, no service cluster, all state lives in plain files inside your repository.", "ev.lede": "Code is delivered and verified automatically by the daemon; every SPEC transition and every agent action is visible live on the Dashboard.", "ev.c1": "SPEC ledger: from one sentence to approved push, states at a glance", "ev.c2": "Command Center: instances, success rate and daily activity of 12 agent classes", "ev.c3": "Activity stream: who read what, changed what, and why, at any time", "g.eyebrow": "DOCS PREVIEW", "g.title": "From quick start to deep governance", "g.lede": "12 topics + 3 handbooks, kept in sync with the Dashboard's Help menu.", "dog.title": "Fenixd is developed by Fenixd", "dog.lede": "Its own repository has pushed 500+ SPECs fully automatically (implement → verify → bounce back → merge), the most direct field validation of the framework, including the site you are looking at.", "dog.cta1": "See how the loop works", "dog.cta2": "Visit GitHub", "cap.more": "Learn more ", "stat.1": "SPECs fully auto-driven (Fenixd's own repo)", "stat.2": "runtime agent roles", "stat.3": "-step zero-trust verification pipeline", "stat.4": "explicit lifecycle states", "stat.5": "database · state as plain files", "cap.1.t": "SPEC-Driven", "cap.1.d": "Vague spoken intent distills into a structured SPEC (proposal / design / specs / tasks), architecture intent stops drifting in chat logs; humans and AI anchor on one reviewable contract.", "cap.2.t": "Verification Loop", "cap.2.d": "Implement → independent verify → bounce-back, bounded by budgets and breakers. Deviation gets pulled back inside the loop instead of accumulating across commits as agentic entropy.", "cap.3.t": "Quality Gates", "cap.3.d": "A zero-LLM engine executes assertions one by one (web / api / cli) and rules pass or fail, no reliance on model goodwill; violations are blocked before merge.", "cap.4.t": "Knowledge Distillation", "cap.4.d": "Acceptance assertions and architecture decisions sink back into repo knowledge; the rulebook grows with every iteration, expert experience distilled into machine-executable constraints.", "cap.5.t": "Global State Machine", "cap.5.d": "11 states, legal transitions only. Agentic entropy is systemic drift across commits, exactly what a global ledger exposes: where every SPEC is, and why, at any moment.", "cap.6.t": "Isolated Worktrees", "cap.6.d": "Every implementation runs in its own git worktree and branch, with merge-back self-healing, a runaway change can never pollute the trunk.", "cap.7.t": "Self-Healing", "cap.7.d": "Administrator / Arbiter chains handle dead ends automatically; otherwise the SPEC parks visibly at blocked awaiting human ruling, expertise stays inside the loop.", "cap.8.t": "Live Dashboard", "cap.8.d": "Every SPEC's live transitions, logs and verification artifacts, aggregated across projects. Entropy is not the enemy; invisible entropy is.", "q.s1.t": "1 · Install the daemon", "q.s1.d": "One-line script sets up the daemon (systemd-resident, supervisor-managed) on Linux and Windows.", "q.s2.t": "2 · File a one-liner", "q.s2.d": "/fenix-new states your idea; the requirement agent clarifies and drafts a full SPEC, recommending an execution mode.", "q.s2.code": "\"one-liner requirement\"", "q.s3.code": "→ /fenix-approve review &amp; push", "q.s3.t": "3 · Wait for code", "q.s3.d": "The daemon picks it up → implements → verifies → done; you approve the push at the single human gate.", "g.1.t": "Quick Start", "g.1.d": "End-to-end flow from zero to delivery", "g.2.t": "Concepts &amp; Architecture", "g.2.d": "Loop principles, 12 agent roles, execution modes", "g.3.t": "Lifecycle &amp; State Machine", "g.3.d": "All 11 states, review gates, bounce-back loops", "g.4.t": "CLI Handbook", "g.4.d": "Every /fenix-* skill explained"}};
+(function () {
+  var dict = window.PROTO_I18N;
+  function apply(lang) {
+    var pack = dict[lang] || {};
+    document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN';
+    if (pack.title) document.title = pack.title;
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var k = el.getAttribute('data-i18n');
+      if (pack[k] !== undefined) el.innerHTML = pack[k];
+    });
+    document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+      var k = el.getAttribute('data-i18n-ph');
+      if (pack[k] !== undefined) el.setAttribute('placeholder', pack[k]);
+    });
+    document.querySelectorAll('[data-i18n-title]').forEach(function (el) {
+      var k = el.getAttribute('data-i18n-title');
+      if (pack[k] !== undefined) el.setAttribute('title', pack[k]);
+    });
+    document.querySelectorAll('[data-i18n-label]').forEach(function (el) {
+      var k = el.getAttribute('data-i18n-label');
+      if (pack[k] !== undefined) el.setAttribute('aria-label', pack[k]);
+    });
+    document.getElementById('lang-zh').classList.toggle('on', lang === 'zh');
+    document.getElementById('lang-en').classList.toggle('on', lang === 'en');
+    try { localStorage.setItem('fenixd-proto-lang', lang); } catch (e) {}
+  }
+  document.getElementById('lang-zh').addEventListener('click', function () { apply('zh'); });
+  document.getElementById('lang-en').addEventListener('click', function () { apply('en'); });
+  var saved = 'zh';
+  try { saved = localStorage.getItem('fenixd-proto-lang') || 'zh'; } catch (e) {}
+  apply(saved);
+  var burger = document.getElementById('nav-burger');
+  if (burger) burger.addEventListener('click', function () {
+    var m = document.getElementById('mobile-nav');
+    var open = m.classList.toggle('open');
+    burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  var PAL_DOCK = document.querySelector('.pal-dock');
+  if (PAL_DOCK) {
+    var dots = PAL_DOCK.querySelectorAll('.pal-dot');
+    var setPal = function (v, save) {
+      document.body.setAttribute('data-palette', v);
+      dots.forEach(function (d) { d.classList.toggle('on', d.getAttribute('data-pal') === v); });
+      if (save) { try { localStorage.setItem('fenixd-proto-palette', v); } catch (e) {} }
+    };
+    var sp = 'orchid-aurora';
+    try { sp = localStorage.getItem('fenixd-proto-palette') || 'orchid-aurora'; } catch (e) {}
+    if (sp !== 'orchid-aurora') setPal(sp, false);
+    dots.forEach(function (d) { d.addEventListener('click', function () { setPal(d.getAttribute('data-pal'), true); }); });
+  }
+})();
+</script>
+<script>
+(function(){
+  var shots = document.querySelectorAll('.card-shot img');
+  if (!shots.length) return;
+  var lb = document.createElement('div');
+  lb.className = 'lb'; lb.style.display = 'none';
+  lb.innerHTML = '<img alt=""><div class="lb-hint">ESC / click to close · 点击关闭</div>';
+  document.body.appendChild(lb);
+  var big = lb.querySelector('img');
+  shots.forEach(function(img){
+    img.addEventListener('click', function(){
+      big.src = img.src; lb.style.display = 'flex';
+    });
+  });
+  lb.addEventListener('click', function(){ lb.style.display = 'none'; });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') lb.style.display = 'none';
+  });
+})();
+</script>
+<script src="annotator.js" defer></script>
+</body>
+</html>

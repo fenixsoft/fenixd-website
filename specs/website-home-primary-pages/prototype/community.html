@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page="community">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>社区（原型）</title>
+<link rel="icon" href="logo-64.png">
+<style>
+:root{
+  --bg:#FAFAFA; --bg-elev:#FFFFFF; --card:#FFFFFF; --card-2:#F4F4F5;
+  --line:#E5E7EB; --line-strong:#D1D5DB;
+  --text:#111827; --text-2:#6B7280; --text-3:#9CA3AF;
+  --ember:#F97316; --ember-hi:#FBBF24; --ember-soft:#EA580C;
+  --ember-deep:#C2410C;
+  --tint-bg:#FFF7ED; --tint-soft:#FFEDD5; --tint-line:#FED7AA; --tint-edge:#FDBA74;
+  --focus-ring:rgba(249,115,22,.15); --glow-a:rgba(249,115,22,.08); --glow-b:rgba(251,191,36,.07);
+  --hl-edge:rgba(249,115,22,.55); --term-ember:#FB923C;
+  --verified:#16A34A; --link:var(--ember-soft); --warn:#B45309; --danger:#DC2626;
+  --grad-brand:linear-gradient(120deg,#EA580C,#F97316);
+  --term-bg:#0F172A; --term-bar:#0B1220;
+  --mono:ui-monospace,'SF Mono','Cascadia Code','JetBrains Mono',Menlo,Consolas,'Liberation Mono',monospace;
+  --sans:system-ui,-apple-system,'Segoe UI',Roboto,'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Noto Sans SC',sans-serif;
+  --radius:16px; --maxw:1200px; --header-h:64px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);
+  font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+img,svg{display:block}
+a{color:var(--link);text-decoration:none}
+a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--ember-soft);outline-offset:2px;border-radius:4px}
+.skip-link{position:absolute;left:-999px;top:8px;z-index:200;background:var(--ember);
+  color:#fff;padding:8px 14px;border-radius:8px;font-weight:600}
+.skip-link:focus{left:8px}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+.mono{font-family:var(--mono)}
+.num{font-variant-numeric:tabular-nums}
+
+/* ---------- 仿样横幅（plain 层必需） ---------- */
+.proto-banner{background:var(--tint-bg);color:var(--ember-deep);border-bottom:1px solid var(--tint-line);
+  font-size:12.5px;line-height:1.5;padding:7px 24px;text-align:center}
+.proto-banner strong{color:var(--ember-deep)}
+
+/* ---------- 头部导航 ---------- */
+.site-header{position:sticky;top:0;z-index:100;height:var(--header-h);
+  background:rgba(255,255,255,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.header-in{max-width:var(--maxw);margin:0 auto;padding:0 24px;height:100%;
+  display:flex;align-items:center;gap:28px}
+.logo{display:flex;align-items:center;gap:10px;color:var(--text);font-weight:700;
+  font-size:18px;letter-spacing:.2px}
+.logo:hover{text-decoration:none}
+.logo .logo-mark{width:26px;height:26px;color:var(--ember)}
+.logo .logo-mark svg{width:26px;height:26px}
+.logo .logo-mark img,.chat-logo img{width:100%;height:100%;object-fit:contain;display:block}
+.logo .logo-lockup{display:block;flex:none}
+.main-nav{display:flex;gap:4px;margin-left:8px}
+.main-nav a{color:var(--text-2);font-size:14.5px;padding:8px 12px;border-radius:8px;
+  position:relative;transition:color .16s,background .16s}
+.main-nav a:hover{color:var(--text);background:rgba(17,24,39,.05);text-decoration:none}
+.main-nav a.active{color:var(--text)}
+.main-nav a.active::after{content:"";position:absolute;left:12px;right:12px;bottom:2px;
+  height:2px;border-radius:2px;background:var(--grad-brand)}
+.header-actions{margin-left:auto;display:flex;align-items:center;gap:12px}
+.lang-toggle{display:flex;border:1px solid var(--line-strong);border-radius:999px;overflow:hidden}
+.lang-toggle button{background:transparent;border:0;color:var(--text-2);cursor:pointer;
+  font-family:var(--mono);font-size:12px;padding:6px 12px;transition:background .16s,color .16s}
+.lang-toggle button.on{background:var(--tint-bg);color:var(--ember-deep)}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;
+  border-radius:8px;border:1px solid var(--line);color:var(--text-2);cursor:pointer;
+  background:transparent;transition:color .16s,border-color .16s}
+.icon-btn:hover{color:var(--text);border-color:var(--line-strong)}
+.gh-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;
+  color:var(--text-2);transition:color .16s}
+.gh-btn:hover{color:var(--ember)}
+.icon-btn svg{width:18px;height:18px}
+.gh-btn svg{width:18px;height:18px}
+.btn{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:14.5px;
+  border-radius:9px;padding:10px 18px;cursor:pointer;border:1px solid transparent;
+  transition:filter .16s,background .16s,border-color .16s}
+.btn svg{width:16px;height:16px}
+.btn-primary{background:var(--ember);color:#fff}
+.btn-primary:hover{background:var(--ember-soft);text-decoration:none}
+.btn-ghost{border-color:var(--line-strong);color:var(--text)}
+.btn-ghost:hover{background:rgba(17,24,39,.05);text-decoration:none}
+.btn-sm{padding:7px 14px;font-size:13.5px}
+.btn-lg{padding:13px 26px;font-size:16px}
+.nav-burger{display:none}
+.mobile-nav{display:none}
+
+/* ---------- 通用 section ---------- */
+.section{padding:88px 0;border-top:1px solid var(--line)}
+.section:first-of-type{border-top:0}
+.eyebrow{font-family:var(--mono);font-size:12.5px;letter-spacing:.22em;color:var(--ember-soft);
+  text-transform:uppercase;display:flex;align-items:center;gap:10px;margin:0 0 14px}
+.eyebrow::before{content:"";width:26px;height:1px;background:var(--grad-brand)}
+h2.sec-title{font-size:32px;line-height:1.25;margin:0 0 14px;font-weight:700;letter-spacing:-.01em}
+.sec-lede{color:var(--text-2);font-size:17px;max-width:640px;margin:0 0 40px}
+.grad-text{background:var(--grad-brand);-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent}
+
+/* ---------- Hero ---------- */
+.hero{padding:96px 0 72px;border-top:0;
+  background:radial-gradient(640px 320px at 88% 8%,var(--glow-a),transparent 70%),
+             radial-gradient(520px 280px at 6% 96%,var(--glow-b),transparent 70%)}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+.hero h1{font-size:50px;line-height:1.18;letter-spacing:-.02em;margin:0 0 22px;font-weight:800}
+.hero .lede{color:var(--text-2);font-size:17.5px;max-width:520px;margin:0 0 32px}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap}
+
+/* ---------- 伪终端 ---------- */
+.term{background:var(--term-bg);border:1px solid var(--line-strong);border-radius:var(--radius);
+  overflow:hidden;box-shadow:0 8px 24px rgba(15,23,42,.12)}
+.term-bar{display:flex;align-items:center;gap:8px;padding:11px 14px;
+  border-bottom:1px solid rgba(148,163,184,.16);background:var(--term-bar)}
+.term-dot{width:11px;height:11px;border-radius:50%;background:#334155}
+.term-dot:nth-child(1){background:#F87171}.term-dot:nth-child(2){background:#FBBF24}
+.term-dot:nth-child(3){background:#22C55E}
+.term-title{margin-left:8px;font-family:var(--mono);font-size:12px;color:#94A3B8}
+.term-body{padding:18px 18px 22px;font-family:var(--mono);font-size:13px;line-height:1.85;
+  color:#CBD5E1;overflow-x:auto}
+.t-p{color:var(--term-ember)}      /* 提示符 */
+.t-c{color:#F1F5F9}      /* 命令 */
+.t-o{color:#CBD5E1}      /* 输出 */
+.t-dim{color:#64748B}    /* 弱输出 */
+.t-ok{color:#4ADE80}     /* 成功 */
+.t-w{color:#FBBF24}      /* 等待 */
+.t-key{color:#7CB0FF}    /* 关键字 */
+
+/* ---------- 对话面板（AI-Native hero，方案 D） ---------- */
+.chat{background:var(--bg-elev);border:1px solid var(--line);border-radius:var(--radius);
+  overflow:hidden;box-shadow:0 8px 24px rgba(15,23,42,.08);display:flex;flex-direction:column}
+.chat-head{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line)}
+.chat-logo{width:28px;height:28px;border-radius:8px;background:var(--tint-bg);border:1px solid var(--tint-line);
+  color:var(--ember-soft);display:flex;align-items:center;justify-content:center;flex:none}
+.chat-logo svg{width:16px;height:16px}
+.chat-title{font-family:var(--mono);font-size:12px;color:var(--text-2)}
+.chat-body{padding:16px;display:flex;flex-direction:column;gap:12px;min-height:340px}
+.bubble{max-width:88%;padding:11px 14px;font-size:13.5px;line-height:1.7;border-radius:14px}
+.bubble.user{align-self:flex-end;background:var(--tint-soft);color:var(--ember-deep);border-bottom-right-radius:4px}
+.bubble.agent{align-self:flex-start;background:var(--card-2);color:var(--text);border-bottom-left-radius:4px}
+.bubble.agent > span{display:block}
+.bubble.agent > span.ctx-cards{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0}
+.ctx{font-family:var(--mono);font-size:11px;color:var(--ember-deep);background:var(--bg-elev);
+  border:1px solid var(--line);border-left:3px solid var(--ember);border-radius:6px;padding:3px 8px}
+.typing{display:inline-flex;gap:5px;margin-top:10px;padding:4px 2px}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--ember);opacity:.35;
+  animation:typing 1.2s ease-in-out infinite}
+.typing i:nth-child(2){animation-delay:.18s}
+.typing i:nth-child(3){animation-delay:.36s}
+@keyframes typing{0%,60%,100%{opacity:.35;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+.chat-input{display:flex;gap:10px;padding:12px;border-top:1px solid var(--line);background:var(--card-2)}
+.chat-field{position:relative;flex:1;min-width:0;display:flex}
+.input-hint{position:absolute;left:13px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:7px;
+  pointer-events:none;color:var(--t3);font-size:13.5px;white-space:nowrap;transition:opacity .15s}
+.input-hint .skill-tag{color:var(--ember);font-weight:600}
+.chat-field input:focus~.input-hint,.chat-field input:not(:placeholder-shown)~.input-hint{opacity:0}
+.chat-input input{flex:1;min-width:0;background:var(--bg-elev);border:1px solid var(--line-strong);
+  border-radius:999px;padding:9px 16px;font-size:13.5px;color:var(--text);outline:0;font-family:var(--sans)}
+.chat-input input:focus{border-color:var(--ember);box-shadow:0 0 0 3px var(--focus-ring)}
+.chat-send{display:inline-flex;align-items:center;gap:6px;background:var(--ember);color:#fff;border:0;
+  border-radius:999px;padding:9px 16px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:var(--sans)}
+.chat-send svg{width:14px;height:14px}
+.chat-send:hover{background:var(--ember-soft)}
+
+/* ---------- 数据带 ---------- */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:22px 20px}
+.stat .v{font-family:var(--mono);font-size:30px;font-weight:700;letter-spacing:-.02em;
+  color:var(--ember)}
+.stat .k{color:var(--text-2);font-size:13.5px;margin-top:6px}
+
+/* ---------- 卡片网格 ---------- */
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:24px;display:flex;flex-direction:column;gap:10px;box-shadow:0 1px 2px rgba(15,23,42,.04);
+  transition:border-color .16s,transform .16s,box-shadow .16s}
+.card:hover{border-color:var(--line-strong);transform:translateY(-2px);box-shadow:0 4px 6px rgba(15,23,42,.06)}
+.card .card-head{display:flex;align-items:center;gap:12px}
+.card .card-head h3{margin:0}
+.card .card-ic{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;
+  justify-content:center;background:var(--tint-bg);color:var(--ember-soft);
+  border:1px solid var(--tint-line)}
+.card .card-ic svg{width:20px;height:20px}
+.card h3{margin:2px 0 0;font-size:17px;font-weight:650}
+.card p{margin:0;color:var(--text-2);font-size:14px;line-height:1.6}
+.card .card-link{margin-top:auto;font-size:13.5px;color:var(--link);display:inline-flex;
+  align-items:center;gap:6px}
+.card .card-link svg{width:14px;height:14px}
+.card .tagline{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+.tag{font-family:var(--mono);font-size:11.5px;color:var(--text-2);border:1px solid var(--line-strong);
+  border-radius:999px;padding:2px 10px}
+.tag.ember{color:var(--ember-deep);border-color:var(--tint-edge)}
+.tag.green{color:#15803D;border-color:#86EFAC}
+
+/* ---------- 痛点 / 对比 ---------- */
+.pain{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.pain .card{background:var(--card-2)}
+.pain .num-badge{font-family:var(--mono);color:var(--danger);font-size:13px;letter-spacing:.1em}
+.answer-strip{margin-top:18px;border:1px dashed var(--tint-edge);border-radius:var(--radius);
+  padding:18px 22px;color:var(--text-2);font-size:15px;background:var(--tint-bg)}
+.answer-strip strong{color:var(--text)}
+
+.cmp{width:100%;border-collapse:collapse;font-size:14.5px;border:1px solid var(--line);
+  border-radius:var(--radius);overflow:hidden}
+.cmp th,.cmp td{padding:13px 18px;text-align:left;border-bottom:1px solid var(--line);
+  vertical-align:top}
+.cmp thead th{background:var(--bg-elev);color:var(--text);font-size:13.5px;
+  font-family:var(--mono);letter-spacing:.05em}
+.cmp thead th.col-fenix{color:var(--ember-soft)}
+.cmp td:first-child{color:var(--text);white-space:nowrap;font-weight:600}
+.cmp td{color:var(--text-2)}
+.cmp td.col-fenix{color:var(--text);background:var(--tint-bg)}
+.cmp tr:last-child td{border-bottom:0}
+.cmp .yes{color:var(--verified)}
+.cmp .no{color:var(--danger)}
+
+/* ---------- 循环图 ---------- */
+.loop-diagram{display:grid;grid-template-columns:repeat(13,auto);align-items:stretch;
+  justify-content:center;gap:0}
+.loop-node{background:var(--card);border:1px solid var(--line-strong);border-radius:10px;
+  padding:12px 13px;min-width:0;text-align:center}
+.loop-node .t{font-weight:650;font-size:13.5px;white-space:nowrap}
+.loop-node .d{font-family:var(--mono);font-size:10.5px;color:var(--text-3);margin-top:4px;white-space:nowrap}
+.loop-node.hl{border-color:var(--term-ember);background:var(--tint-bg)}
+.loop-node.gate{border-color:rgba(34,197,94,.5)}
+.loop-arrow{display:flex;align-items:center;color:var(--text-3);padding:0 6px}
+.loop-arrow svg{width:20px;height:20px}
+.loop-back{margin-top:16px;text-align:center;font-family:var(--mono);font-size:12.5px;
+  color:var(--warn);display:flex;align-items:center;justify-content:center;gap:8px}
+.loop-back svg{width:16px;height:16px}
+
+/* ---------- 状态机 chips ---------- */
+.state-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.st{font-family:var(--mono);font-size:12.5px;padding:5px 12px;border-radius:999px;
+  border:1px solid var(--line-strong);color:var(--text-2);background:var(--card)}
+.st.done{border-color:rgba(34,197,94,.5);color:var(--verified)}
+.st.hl{border-color:var(--hl-edge);color:var(--ember-soft)}
+.st-risk{border-color:rgba(245,158,11,.5);color:var(--warn)}
+.state-sep{color:var(--text-3);font-size:13px}
+
+/* ---------- 架构分层 ---------- */
+.arch{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.arch-col{background:var(--card-2);border:1px solid var(--line);border-radius:var(--radius);
+  padding:20px;display:flex;flex-direction:column;gap:10px}
+.arch-col h4{margin:0;font-size:13px;font-family:var(--mono);letter-spacing:.14em;
+  color:var(--ember-soft);text-transform:uppercase}
+.arch-item{border:1px solid var(--line);border-radius:8px;padding:10px 14px;
+  background:var(--card);font-size:13.5px;color:var(--text-2)}
+.arch-item b{color:var(--text);font-weight:600;display:block;font-size:14px;margin-bottom:2px}
+
+/* ---------- 文档页 ---------- */
+.doc-search{display:flex;align-items:center;gap:12px;background:var(--card);
+  border:1px solid var(--line-strong);border-radius:12px;padding:14px 18px;max-width:720px}
+.doc-search svg{width:20px;height:20px;color:var(--text-3);flex:none}
+.doc-search input{flex:1;background:transparent;border:0;outline:0;color:var(--text);
+  font-size:15.5px;font-family:var(--sans)}
+.doc-search input::placeholder{color:var(--text-3)}
+.doc-search kbd{font-family:var(--mono);font-size:11.5px;color:var(--text-3);
+  border:1px solid var(--line-strong);border-radius:6px;padding:3px 8px;white-space:nowrap}
+.path-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:56px}
+.path-card{position:relative;background:var(--card-2);border:1px solid var(--line);
+  border-radius:var(--radius);padding:22px}
+.path-card .step{font-family:var(--mono);font-size:12px;color:var(--ember-soft);letter-spacing:.18em}
+.path-card h3{margin:8px 0 6px;font-size:17px}
+.path-card p{margin:0;color:var(--text-2);font-size:14px}
+.card-featured{grid-column:1/-1;display:grid;grid-template-columns:1.05fr .95fr;gap:26px;align-items:start}
+.card-featured .card-body{display:flex;flex-direction:column;gap:10px;min-width:0}
+.card-shot{margin:0;border:1px solid var(--line-strong);border-radius:12px;overflow:hidden;box-shadow:0 6px 18px rgba(15,23,42,.10);background:var(--card)}
+.card-shot img{width:100%;display:block;aspect-ratio:16/9;object-fit:cover;object-position:top left}
+.card-shot figcaption{font-family:var(--mono);font-size:11px;color:var(--text-3);padding:7px 12px;border-top:1px solid var(--line);background:var(--card-2)}
+@media(max-width:920px){.card-featured{grid-template-columns:1fr}}
+.card-featured h3{white-space:nowrap}
+.card-shot img{cursor:zoom-in}
+.caps-grid{grid-template-columns:repeat(auto-fit,minmax(520px,1fr));grid-auto-flow:dense}
+.caps-grid > .card:not(.card-featured){min-width:0}
+/* mode 两卡：上下堆叠各占整行，icon+标题同行 */
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.mode-grid .card .card-head{margin-bottom:10px}
+.mode-grid .card p{max-width:75ch;margin-bottom:14px}
+
+.lc-figure{margin:26px 0 0;border:1px solid var(--line-strong);border-radius:16px;background:var(--card);box-shadow:0 6px 18px rgba(15,23,42,.08);overflow:hidden}
+.lc-figure svg{display:block;width:92%;height:auto;margin:0 auto}
+.lc-figure figcaption{font-family:var(--mono);font-size:11px;color:var(--text-3);padding:8px 14px;border-top:1px solid var(--line);background:var(--card-2)}
+.lb{position:fixed;inset:0;z-index:300;background:rgba(11,17,32,.92);display:flex;align-items:center;justify-content:center;cursor:zoom-out;padding:4vh 4vw}
+.lb img{max-width:92vw;max-height:88vh;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5);background:#fff}
+.lb-hint{position:absolute;bottom:3vh;left:0;right:0;text-align:center;color:#cbd5e1;font-family:var(--mono);font-size:12px}
+.hero-split{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+.hero-vis{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hv-card{display:flex;flex-direction:column;gap:6px;background:var(--card);border:1px solid var(--line);
+  border-radius:12px;padding:16px 18px;text-decoration:none;transition:border-color .16s,transform .16s}
+.hv-card:hover{border-color:var(--ember);transform:translateY(-2px)}
+.hv-ic{width:30px;height:30px;border-radius:8px;background:var(--tint-bg);color:var(--ember);
+  display:inline-flex;align-items:center;justify-content:center}
+.hv-head{display:flex;align-items:center;gap:10px}
+.hv-d{font-size:12.5px;color:var(--text-2);line-height:1.5}
+.hv-t{font-weight:650;font-size:14.5px;color:var(--text)}
+.hv-n{font-family:var(--mono);font-size:11.5px;color:var(--text-3)}
+@media(max-width:920px){.hero-split{grid-template-columns:1fr}
+  .loop-diagram{grid-template-columns:repeat(7,auto);row-gap:12px;justify-content:center}}
+.grp-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin:0 0 18px}
+.grp-head h3{display:flex;align-items:center;gap:10px;font-size:16px;margin:0}
+.grp-lede{color:var(--text-2);font-size:14px}
+.doc-group{margin-bottom:44px}
+.doc-group h3{display:flex;align-items:center;gap:10px;font-size:16px;margin:0 0 14px}
+.grp-head .cnt{font-family:var(--mono);font-size:12px;color:var(--text-3);
+  border:1px solid var(--line-strong);border-radius:999px;padding:1px 9px;white-space:nowrap}
+.doc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.doc-card{display:block;background:var(--card);border:1px solid var(--line);
+  border-radius:9px;padding:16px 18px;color:var(--text);
+  transition:border-color .16s,transform .16s}
+.doc-card:hover{border-color:var(--line-strong);transform:translateY(-2px);text-decoration:none}
+.doc-card .no{font-family:var(--mono);font-size:11.5px;color:var(--text-3)}
+.doc-card .tt{font-weight:650;font-size:14.5px;margin:3px 0 4px}
+.doc-card .ds{color:var(--text-2);font-size:13px;line-height:1.55}
+
+/* ---------- 社区页 ---------- */
+.gh-card{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;align-items:stretch}
+.gh-main{background:var(--card);border:1px solid var(--line-strong);border-radius:var(--radius);
+  padding:26px}
+.gh-main .repo{display:flex;align-items:center;gap:12px;font-family:var(--mono);
+  font-size:17px;font-weight:600}
+.gh-main .repo svg{width:22px;height:22px;color:var(--text-2)}
+.gh-stats{display:flex;gap:26px;margin:18px 0}
+.gh-stats .s .v{font-family:var(--mono);font-size:22px;font-weight:700}
+.gh-stats .s .k{font-size:12.5px;color:var(--text-2)}
+.gh-side{display:flex;flex-direction:column;gap:12px}
+.mini-card{background:var(--card-2);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px;display:flex;gap:12px;align-items:flex-start}
+.mini-card .card-ic{flex:none;width:34px;height:34px;border-radius:9px;background:var(--tint-bg);
+  color:var(--ember-soft);display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--tint-line)}
+.mini-card .card-ic svg{width:17px;height:17px}
+.mini-card h4{margin:0 0 3px;font-size:14.5px}
+.mini-card p{margin:0;color:var(--text-2);font-size:13px}
+.chan-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.roadmap-item{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--line)}
+.roadmap-item:last-child{border-bottom:0}
+.roadmap-item .ver{font-family:var(--mono);font-size:13px;color:var(--ember-soft);
+  min-width:86px;padding-top:2px}
+.roadmap-item .bd h4{margin:0 0 3px;font-size:14.5px;font-weight:600}
+.roadmap-item .bd p{margin:0;color:var(--text-2);font-size:13.5px}
+
+/* ---------- CTA 带 ---------- */
+.cta-band{border-radius:var(--radius);padding:44px 40px;margin-top:28px;
+  background:linear-gradient(180deg,var(--tint-bg),#FFFFFF)}
+.cta-band h2{margin:0 0 10px;font-size:26px}
+.cta-band p{margin:0 0 24px;color:var(--text-2);font-size:15.5px}
+.cta-band .hero-ctas{margin:0}
+
+/* ---------- 页脚 ---------- */
+.site-footer{border-top:1px solid var(--line);background:var(--bg-elev);padding:56px 0 32px;
+  margin-top:0}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr;gap:32px}
+.foot-brand p{color:var(--text-2);font-size:13.5px;max-width:260px;margin:12px 0 0}
+.foot-col h4{font-size:13px;font-family:var(--mono);letter-spacing:.16em;color:var(--text-3);
+  text-transform:uppercase;margin:0 0 14px}
+.foot-col a{display:block;color:var(--text-2);font-size:14px;padding:5px 0}
+.ft-disabled{display:block;color:var(--text-3);font-size:14px;padding:5px 0;cursor:not-allowed}
+.foot-col a:hover{color:var(--text)}
+.foot-bottom{margin-top:44px;padding-top:22px;border-top:1px solid var(--line);
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  color:var(--text-3);font-size:13px}
+
+/* ---------- 响应式 ---------- */
+@media (max-width:1024px){
+  .hero-grid{grid-template-columns:1fr;gap:40px}
+  .hero h1{font-size:40px}
+  .grid-4{grid-template-columns:repeat(2,1fr)}
+  .stats{grid-template-columns:repeat(3,1fr)}
+  .foot-grid{grid-template-columns:1fr 1fr 1fr}
+  .main-nav{display:none}
+  .nav-burger{display:inline-flex}
+  .mobile-nav{display:none;position:fixed;top:var(--header-h);left:0;right:0;z-index:99;
+    background:var(--bg-elev);border-bottom:1px solid var(--line);padding:12px 24px 18px}
+  .mobile-nav.open{display:block}
+  .mobile-nav a{display:block;padding:12px 4px;color:var(--text-2);font-size:16px;
+    border-bottom:1px solid var(--line)}
+  .mobile-nav a:last-child{border-bottom:0}
+}
+@media (max-width:768px){
+  .section{padding:64px 0}
+  .hero{padding:64px 0 48px}
+  .hero h1{font-size:33px}
+  h2.sec-title{font-size:26px}
+  .grid-3,.pain,.arch,.path-row{grid-template-columns:1fr}
+  .caps-grid{grid-template-columns:1fr}
+  .mode-grid{grid-template-columns:1fr}
+  .grid-4,.doc-grid,.chan-grid{grid-template-columns:repeat(2,1fr)}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .gh-card{grid-template-columns:1fr}
+  .cmp{font-size:13px}
+  .cmp th,.cmp td{padding:10px 10px}
+  .header-actions .btn{display:none}
+}
+@media (max-width:480px){
+  .grid-4,.doc-grid,.chan-grid,.stats{grid-template-columns:1fr}
+  .cta-band{padding:30px 22px}
+  .foot-grid{grid-template-columns:1fr 1fr}
+}
+
+/* ---------- palette dock & themes ---------- */
+.pal-dock{position:fixed;left:16px;bottom:16px;z-index:80;display:flex;align-items:center;gap:8px;
+  background:var(--bg-elev);border:1px solid var(--line);border-radius:999px;padding:7px 12px;
+  box-shadow:0 6px 18px rgba(17,24,39,.10)}
+.pal-dock .pal-cap{font-size:11px;color:var(--text-3);margin-right:2px}
+.pal-dot{width:18px;height:18px;border-radius:50%;border:2px solid transparent;padding:0;cursor:pointer;
+  appearance:none;background-clip:padding-box;flex:none}
+.pal-dot.on{border-color:var(--text);box-shadow:inset 0 0 0 2px var(--bg-elev)}
+.pal-dot.p-ember{background:linear-gradient(120deg,#EA580C,#F97316)}
+.pal-dot.p-violet{background:linear-gradient(120deg,#7C3AED,#8B5CF6)}
+.pal-dot.p-orchid{background:linear-gradient(120deg,#9C2F81,#B8409A)}
+.pal-dot.p-royal{background:linear-gradient(120deg,#5B21B6,#6D28D9)}
+.pal-dot.p-aurora{background:linear-gradient(120deg,#0891B2,#8B5CF6)}
+.pal-dot.p-orchid-aurora{background:linear-gradient(135deg,#B8409A 0%,#8B5CF6 50%,#0891B2 100%)}
+body[data-palette="violet"]{--ember:#8B5CF6;--ember-soft:#7C3AED;--ember-deep:#6D28D9;
+  --tint-bg:#F5F3FF;--tint-soft:#EDE9FE;--tint-line:#DDD6FE;--tint-edge:#C4B5FD;
+  --focus-ring:rgba(139,92,246,.15);--glow-a:rgba(139,92,246,.08);--glow-b:rgba(196,181,253,.07);
+  --hl-edge:rgba(139,92,246,.55);--term-ember:#A78BFA;
+  --grad-brand:linear-gradient(120deg,#7C3AED,#8B5CF6);--link:#7C3AED}
+body[data-palette="orchid"]{--ember:#B8409A;--ember-soft:#9C2F81;--ember-deep:#83286B;
+  --tint-bg:#FDF2F8;--tint-soft:#FCE7F3;--tint-line:#FBCFE8;--tint-edge:#F9A8D4;
+  --focus-ring:rgba(184,64,154,.15);--glow-a:rgba(184,64,154,.08);--glow-b:rgba(249,168,212,.07);
+  --hl-edge:rgba(184,64,154,.55);--term-ember:#DA8BC4;
+  --grad-brand:linear-gradient(120deg,#9C2F81,#B8409A);--link:#9C2F81}
+body[data-palette="royal"]{--ember:#6D28D9;--ember-soft:#5B21B6;--ember-deep:#4C1D95;
+  --tint-bg:#F5F3FF;--tint-soft:#EDE9FE;--tint-line:#C4B5FD;--tint-edge:#A78BFA;
+  --focus-ring:rgba(109,40,217,.15);--glow-a:rgba(109,40,217,.08);--glow-b:rgba(167,139,250,.07);
+  --hl-edge:rgba(109,40,217,.55);--term-ember:#C4B5FD;
+  --grad-brand:linear-gradient(120deg,#5B21B6,#7C3AED);--link:#6D28D9}
+body[data-palette="aurora"]{--ember:#8B5CF6;--ember-soft:#7C3AED;--ember-deep:#6D28D9;
+  --tint-bg:#F5F3FF;--tint-soft:#EDE9FE;--tint-line:#DDD6FE;--tint-edge:#C4B5FD;
+  --focus-ring:rgba(139,92,246,.15);--glow-a:rgba(8,145,178,.08);--glow-b:rgba(139,92,246,.07);
+  --hl-edge:rgba(8,145,178,.55);--term-ember:#67E8F9;
+  --grad-brand:linear-gradient(120deg,#0891B2,#8B5CF6);--link:#0E7490}
+body[data-palette="orchid-aurora"]{--ember:#B8409A;--ember-soft:#9C2F81;--ember-deep:#83286B;
+  --tint-bg:#FDF2F8;--tint-soft:#FCE7F3;--tint-line:#FBCFE8;--tint-edge:#F9A8D4;
+  --focus-ring:rgba(184,64,154,.15);--glow-a:rgba(8,145,178,.08);--glow-b:rgba(184,64,154,.07);
+  --hl-edge:rgba(184,64,154,.55);--term-ember:#E879C8;
+  --grad-brand:linear-gradient(120deg,#0891B2 0%,#8B5CF6 48%,#B8409A 100%);--link:#0E7490}
+body[data-palette="ember"]{--ember:#F97316;--ember-soft:#EA580C;--ember-deep:#C2410C;
+  --tint-bg:#FFF7ED;--tint-soft:#FFEDD5;--tint-line:#FED7AA;--tint-edge:#FDBA74;
+  --focus-ring:rgba(249,115,22,.15);--glow-a:rgba(249,115,22,.08);--glow-b:rgba(251,191,36,.07);
+  --hl-edge:rgba(249,115,22,.55);--term-ember:#FB923C;
+  --grad-brand:linear-gradient(120deg,#EA580C,#F97316);--link:#EA580C}
+@media (max-width:768px){.pal-dock{left:10px;bottom:10px;padding:5px 8px;gap:6px}
+  .pal-dock .pal-cap{display:none}.pal-dot{width:15px;height:15px}}
+</style>
+</head>
+<body data-palette="orchid-aurora">
+<a class="skip-link" href="#main" data-i18n="a11y.skip">跳到主内容</a>
+<div class="proto-banner" data-proto-id="community-proto-banner"><strong>仿样原型 · 视觉参照、无约束力</strong> ， 本原型为纯 HTML/CSS 仿样级（栈画像 unknown，纯静态站点无组件库），批准后仅作视觉参照；约束力由 SPEC 的 DESIGN.md 承载</div>
+<header class="site-header" data-proto-id="community-header">
+  <div class="header-in">
+    <a class="logo" href="index.html" data-proto-id="community-logo">
+      <span class="logo-mark"><img src="logo-64.png" alt=""></span><svg class="logo-lockup" width="124" height="38" viewBox="0 0 124 38" role="img" aria-label="Fenix Harness, The AI-Native SDLC"><text x="0" y="17" textLength="117.3" lengthAdjust="spacing" font-family="Montserrat,-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="12.5px" font-weight="600" letter-spacing="1px" fill="var(--text)">FENIX <tspan font-weight="500" fill="var(--text-2)">HARNESS</tspan></text><text x="0" y="30.5" textLength="117.3" lengthAdjust="spacing" font-family="Montserrat,-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif" font-size="9px" font-weight="500" letter-spacing="2.2px" fill="var(--text-3)">THE AI-NATIVE SDLC</text></svg>
+    </a>
+    <nav class="main-nav" data-proto-id="community-nav" aria-label="主导航">
+      <a href="index.html" data-i18n="nav.home">首页</a>
+      <a href="index.html#quickstart" data-i18n="nav.quick">快速开始</a>
+      <a href="why.html" data-i18n="nav.why">使用场景</a>
+      <a href="capabilities.html" data-i18n="nav.capabilities">能力全景</a>
+      <a href="docs.html" data-i18n="nav.docs">文档</a>
+      <a href="community.html" data-i18n="nav.community" class="active">社区</a>
+    </nav>
+    <div class="header-actions">
+      <div class="lang-toggle" data-proto-id="nav-lang-toggle" role="group" aria-label="语言切换">
+        <button type="button" id="lang-zh" class="on">中文</button>
+        <button type="button" id="lang-en">EN</button>
+      </div>
+      <a class="gh-btn" href="https://github.com/fenixsoft/fenixd" aria-label="GitHub" data-proto-id="community-github-btn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path fill="currentColor" stroke="none" d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-.99-.78-.015-.765.915.015 1.545.84 1.76 1.185.945 1.62 2.445 1.17 3.03.885.09-.66.375-1.17.675-1.44-2.67-.3-5.46-1.335-5.46-5.925 0-1.17.42-2.13 1.11-2.88-.12-.3-.48-1.5.105-3.12 0 0 .9-.285 2.955 1.11.87-.24 1.77-.36 2.685-.36.915 0 1.83.12 2.685.36 2.055-1.395 2.955-1.11 2.955-1.11.585 1.62.225 2.82.105 3.12.69.75 1.11 1.71 1.11 2.88 0 4.6-2.79 5.625-5.46 5.925.39.33.72 1.005.72 2.025 0 1.44-.015 2.61-.015 2.955 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg></a>
+
+      <button type="button" class="icon-btn nav-burger" id="nav-burger" aria-label="打开菜单" aria-expanded="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></button>
+    </div>
+  </div>
+</header>
+<nav class="mobile-nav" id="mobile-nav" data-proto-id="community-mobile-nav" aria-label="移动端导航">
+  <a href="index.html" data-i18n="nav.home">首页</a>
+  <a href="index.html#quickstart" data-i18n="nav.quick">快速开始</a>
+  <a href="why.html" data-i18n="nav.why">使用场景</a>
+  <a href="capabilities.html" data-i18n="nav.capabilities">能力全景</a>
+  <a href="docs.html" data-i18n="nav.docs">文档</a>
+  <a href="community.html" data-i18n="nav.community">社区</a>
+</nav>
+<main id="main">
+
+<section class="hero" data-proto-id="comm-hero">
+  <div class="wrap">
+    <p class="eyebrow" data-i18n="hero.eyebrow">COMMUNITY</p>
+    <h1 style="font-size:44px;line-height:1.2;margin:0 0 18px;font-weight:800" data-i18n="hero.h1">…</h1>
+    <p class="lede" style="max-width:none" data-i18n="hero.lede">…</p>
+  </div>
+</section>
+
+<section class="section" data-proto-id="comm-github">
+  <div class="wrap">
+    <div class="gh-card" data-proto-id="comm-gh-card">
+      <div class="gh-main" data-proto-id="comm-gh-main">
+        <div class="repo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path fill="currentColor" stroke="none" d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-.99-.78-.015-.765.915.015 1.545.84 1.76 1.185.945 1.62 2.445 1.17 3.03.885.09-.66.375-1.17.675-1.44-2.67-.3-5.46-1.335-5.46-5.925 0-1.17.42-2.13 1.11-2.88-.12-.3-.48-1.5.105-3.12 0 0 .9-.285 2.955 1.11.87-.24 1.77-.36 2.685-.36.915 0 1.83.12 2.685.36 2.055-1.395 2.955-1.11 2.955-1.11.585 1.62.225 2.82.105 3.12.69.75 1.11 1.71 1.11 2.88 0 4.6-2.79 5.625-5.46 5.925.39.33.72 1.005.72 2.025 0 1.44-.015 2.61-.015 2.955 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg><span data-i18n="gh.repo">Fenixd / Fenixd</span></div>
+        <p style="color:var(--text-2);font-size:14.5px;margin:12px 0 0" data-i18n="gh.desc">…</p>
+        <div class="gh-stats" data-proto-id="comm-gh-stats">
+          <div class="s"><div class="v num">2.1k</div><div class="k" data-i18n="gh.s1">…</div></div>
+          <div class="s"><div class="v num">318</div><div class="k" data-i18n="gh.s2">…</div></div>
+          <div class="s"><div class="v num">47</div><div class="k" data-i18n="gh.s3">…</div></div>
+          <div class="s"><div class="v num">Python</div><div class="k" data-i18n="gh.s4">…</div></div>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <a class="btn btn-ghost btn-sm mono" href="https://github.com/fenixsoft/fenixd.git" data-i18n="gh.clone">git clone</a>
+          <a class="btn btn-primary btn-sm" href="https://github.com/fenixsoft/fenixd" data-i18n="gh.b1">查看仓库<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        </div>
+      </div>
+      <div class="gh-side" data-proto-id="comm-side-grid"><div class="mini-card" data-proto-id="comm-side-1">
+  <div class="card-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-8 8H4l2.4-2.4A8 8 0 1 1 21 12z"/></svg></div>
+  <div><h4 data-i18n="side.1.t">…</h4><p data-i18n="side.1.d">…</p></div>
+</div><div class="mini-card" data-proto-id="comm-side-2">
+  <div class="card-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17.2v.3"/></svg></div>
+  <div><h4 data-i18n="side.2.t">…</h4><p data-i18n="side.2.d">…</p></div>
+</div><div class="mini-card" data-proto-id="comm-side-3">
+  <div class="card-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 3L5 13h6l-1 8 8-10h-6z"/></svg></div>
+  <div><h4 data-i18n="side.3.t">…</h4><p data-i18n="side.3.d">…</p></div>
+</div><div class="mini-card" data-proto-id="comm-side-4">
+  <div class="card-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M17.5 14.4c2.1.8 3.5 2.9 3.5 5.6"/></svg></div>
+  <div><h4 data-i18n="side.4.t">…</h4><p data-i18n="side.4.d">…</p></div>
+</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" data-proto-id="comm-roadmap">
+  <div class="wrap">
+    <p class="eyebrow" data-i18n="road.eyebrow">RELEASE NOTES</p>
+    <h2 class="sec-title" data-i18n="road.title">…</h2>
+    <div style="border-top:1px solid var(--line);margin-top:28px" data-proto-id="comm-road-list"><div class="roadmap-item" data-proto-id="comm-road-1">
+  <span class="ver mono" data-i18n="road.1.v">…</span>
+  <div class="bd"><h4 data-i18n="road.1.t">…</h4><p data-i18n="road.1.d">…</p></div>
+</div><div class="roadmap-item" data-proto-id="comm-road-2">
+  <span class="ver mono" data-i18n="road.2.v">…</span>
+  <div class="bd"><h4 data-i18n="road.2.t">…</h4><p data-i18n="road.2.d">…</p></div>
+</div><div class="roadmap-item" data-proto-id="comm-road-3">
+  <span class="ver mono" data-i18n="road.3.v">…</span>
+  <div class="bd"><h4 data-i18n="road.3.t">…</h4><p data-i18n="road.3.d">…</p></div>
+</div></div>
+    <p style="margin-top:18px"><a href="https://github.com/fenixsoft/fenixd/releases" data-i18n="road.link">查看完整更新日志</a></p>
+  </div>
+</section>
+
+<section class="section" data-proto-id="comm-contribute">
+  <div class="wrap">
+    <p class="eyebrow" data-i18n="ct.eyebrow">CONTRIBUTE</p>
+    <h2 class="sec-title" data-i18n="ct.title">…</h2>
+    <p class="sec-lede" data-i18n="ct.lede">…</p>
+    <div class="grid-4" data-proto-id="comm-ct-grid"><article class="card" data-proto-id="comm-ct-1">
+  <div class="card-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17.2v.3"/></svg></div>
+  <h3 data-i18n="ct.1.t">…</h3><p data-i18n="ct.1.d">…</p>
+</article><article class="card" data-proto-id="comm-ct-2">
+  <div class="card-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h14v18H6a2 2 0 0 0-2 2z"/><path d="M4 19a2 2 0 0 1 2-2h14"/></svg></div>
+  <h3 data-i18n="ct.2.t">…</h3><p data-i18n="ct.2.d">…</p>
+</article><article class="card" data-proto-id="comm-ct-3">
+  <div class="card-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="8" r="2.5"/><path d="M6 8.5v7M18 10.5c0 3-2.5 4-5.5 4"/></svg></div>
+  <h3 data-i18n="ct.3.t">…</h3><p data-i18n="ct.3.d">…</p>
+</article><article class="card" data-proto-id="comm-ct-4">
+  <div class="card-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-8 8H4l2.4-2.4A8 8 0 1 1 21 12z"/></svg></div>
+  <h3 data-i18n="ct.4.t">…</h3><p data-i18n="ct.4.d">…</p>
+</article></div>
+    <div class="cta-band" style="margin-top:56px" data-proto-id="comm-cta-band">
+      <h2 data-i18n="cta.t">从一个 issue 开始</h2>
+      <p data-i18n="cta.d">或者先装一个，让它替你把第一句话变成代码。</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="index.html#quickstart" data-i18n="nav.cta">快速开始</a>
+        <a class="btn btn-ghost" href="docs.html" data-i18n="nav.docs">文档</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="site-footer" data-proto-id="community-footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="logo" href="index.html"><span class="logo-mark"><img src="logo-64.png" alt=""></span><span>Fenixd</span></a>
+        <p data-i18n="footer.brand">Fenix Loop Engineering Framework，把「写软件」编排成受控闭环：实现、独立验证、打回修复，质量由循环收敛保证。</p>
+      </div>
+      <div class="foot-col" data-proto-id="community-footer-product">
+        <h4 data-i18n="footer.product">产品</h4>
+        <a href="why.html" data-i18n="footer.p1">为什么是 Fenixd</a>
+        <a href="capabilities.html" data-i18n="footer.p2">能力全景</a>
+        <a href="https://github.com/fenixsoft/fenixd/releases" data-i18n="footer.p3">更新日志</a>
+        <span class="ft-disabled" data-i18n="footer.p4">路线图</span>
+      </div>
+      <div class="foot-col" data-proto-id="community-footer-docs">
+        <h4 data-i18n="footer.docs">文档</h4>
+        <a href="docs.html" data-i18n="footer.d1">快速上手</a>
+        <a href="docs.html" data-i18n="footer.d2">核心概念与架构</a>
+        <a href="docs.html" data-i18n="footer.d3">CLI 操作手册</a>
+        <a href="docs.html" data-i18n="footer.d4">FAQ 与故障排查</a>
+      </div>
+      <div class="foot-col" data-proto-id="community-footer-community">
+        <h4 data-i18n="footer.community">社区</h4>
+        <a href="https://github.com/fenixsoft/fenixd" data-i18n="footer.c1">GitHub</a>
+        <a href="https://github.com/fenixsoft/fenixd/discussions" data-i18n="footer.c2">Discussions</a>
+        <a href="https://github.com/fenixsoft/fenixd/issues" data-i18n="footer.c3">问题反馈</a>
+        <a href="https://github.com/fenixsoft/fenixd/blob/main/docs/help/14-contributing.md" data-i18n="footer.c4">贡献指南</a>
+      </div>
+      <div class="foot-col" data-proto-id="community-footer-about">
+        <h4 data-i18n="footer.about">关于</h4>
+        <a href="https://icyfenix.cn" data-i18n="footer.a1">博客</a>
+        <a href="mailto:icyfenix@gmail.com" data-i18n="footer.a2">联系</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span data-i18n="footer.legal">© 2026 Fenixd · Fenix Loop Engineering Framework</span>
+      <span class="mono" data-i18n="footer.dogfood">Fenixd 由 Fenixd 自动开发，本站亦然</span>
+    </div>
+  </div>
+</footer>
+<div class="pal-dock" data-proto-id="community-palette-dock" role="group" aria-label="配色方案切换（原型比选用）">
+  <span class="pal-cap">配色</span>
+  <button type="button" class="pal-dot p-ember" data-pal="ember" data-i18n-title="pal.ember" data-i18n-label="pal.ember" aria-label="余烬橙"></button>
+  <button type="button" class="pal-dot p-violet" data-pal="violet" data-i18n-title="pal.violet" data-i18n-label="pal.violet" aria-label="紫罗兰"></button>
+  <button type="button" class="pal-dot p-orchid" data-pal="orchid" data-i18n-title="pal.orchid" data-i18n-label="pal.orchid" aria-label="品红梅"></button>
+  <button type="button" class="pal-dot p-royal" data-pal="royal" data-i18n-title="pal.royal" data-i18n-label="pal.royal" aria-label="深靛紫"></button>
+  <button type="button" class="pal-dot p-aurora" data-pal="aurora" data-i18n-title="pal.aurora" data-i18n-label="pal.aurora" aria-label="极光紫青"></button>
+  <button type="button" class="pal-dot p-orchid-aurora on" data-pal="orchid-aurora" data-i18n-title="pal.orchid-aurora" data-i18n-label="pal.orchid-aurora" aria-label="品红极光"></button>
+</div>
+
+<script>
+window.PROTO_I18N = {"zh": {"a11y.skip": "跳到主内容", "nav.home": "首页", "nav.quick": "快速开始", "nav.why": "使用场景", "nav.capabilities": "能力全景", "nav.docs": "文档", "nav.community": "社区", "nav.cta": "快速开始", "footer.brand": "Fenix Loop Engineering Framework，把「写软件」编排成受控闭环：实现、独立验证、打回修复，质量由循环收敛保证。", "footer.product": "产品", "footer.p1": "为什么是 Fenixd", "footer.p2": "能力全景", "footer.p3": "更新日志", "footer.p4": "路线图", "footer.docs": "文档", "footer.d1": "快速上手", "footer.d2": "核心概念与架构", "footer.d3": "CLI 操作手册", "footer.d4": "FAQ 与故障排查", "footer.community": "社区", "footer.c1": "GitHub", "footer.c2": "Discussions", "footer.c3": "问题反馈", "footer.c4": "贡献指南", "footer.about": "关于", "footer.a1": "博客", "footer.a2": "联系", "footer.legal": "© 2026 Fenixd · Fenix Loop Engineering Framework", "footer.dogfood": "Fenixd 由 Fenixd 自动开发，本站亦然", "pal.ember": "余烬橙", "pal.violet": "紫罗兰", "pal.orchid": "品红梅", "pal.royal": "深靛紫", "pal.aurora": "极光紫青", "pal.orchid-aurora": "品红极光（当前默认 · 品红梅 × 极光紫青）", "title": "社区 · Fenixd", "hero.eyebrow": "COMMUNITY", "hero.h1": "<span class=\"grad-text\">Fenixd 社区</span>", "hero.lede": "Fenixd 在公开仓库中演化：每个 SPEC 都是一次公开的实验，每条状态转移都有据可查。来看看它，或者参与它。", "gh.repo": "Fenixd / Fenixd", "gh.desc": "Fenix Loop Engineering Framework，Harness 中立的自动化软件开发循环框架（支持 Claude Code、DSH 等）。本仓库由 Fenixd 自身驱动演进。", "gh.s1": "stars（示例）", "gh.s2": "forks（示例）", "gh.s3": "issues", "gh.s4": "语言", "gh.clone": "git clone", "gh.b1": "查看仓库", "gh.b2": "提交 Issue", "side.1.t": "Discussions", "side.1.d": "用法讨论、案例分享、路线图共创", "side.2.t": "缺陷反馈", "side.2.d": "带 .fenix/ 产物与日志的 issue 模板，定位更快", "side.3.t": "发布订阅", "side.3.d": "Release 与更新日志通知", "side.4.t": "微信交流群", "side.4.d": "中文用户群，入口见 README（示例）", "road.eyebrow": "RELEASE NOTES", "road.title": "近期动态", "road.1.v": "v0.9.x", "road.1.t": "打回修复循环收敛率提升", "road.1.d": "预算熔断阈值分级细化，回归率显著下降（示例数据）", "road.2.v": "v0.8.x", "road.2.t": "验证引擎多形态扩展", "road.2.d": "web / api / cli 三形态场景 runner，Playwright 截图对比入列（示例数据）", "road.3.v": "v0.7.x", "road.3.t": "知识真相源上线", "road.3.d": "spec/knowledge/ 能力域目录 + 回填体检车道（示例数据）", "road.link": "查看完整更新日志", "ct.eyebrow": "CONTRIBUTE", "ct.title": "参与贡献", "ct.lede": "从一句话 issue 到核心模块 PR，每个层级的参与都被欢迎，毕竟，这个项目最擅长把一句话变成完整交付。", "ct.1.t": "报告缺陷", "ct.1.d": "按 issue 模板附上 .fenix/ 产物，缺陷修复车道会按批消化", "ct.2.t": "改进文档", "ct.2.d": "docs/help/ 与 Dashboard 帮助菜单同源，勘误即是贡献", "ct.3.t": "提交 PR", "ct.3.d": "核心改动同样走 SPEC 流程，请先开 issue 对齐意图", "ct.4.t": "分享案例", "ct.4.d": "在 Discussions 发布你的 SPEC 实录与调参经验", "cta.t": "从一个 issue 开始", "cta.d": "或者先装一个，让它替你把第一句话变成代码。"}, "en": {"a11y.skip": "Skip to content", "nav.home": "Home", "nav.quick": "Quick Start", "nav.why": "Why Fenixd", "nav.capabilities": "Capabilities", "nav.docs": "Docs", "nav.community": "Community", "nav.cta": "Get Started", "footer.brand": "Fenix Loop Engineering Framework, software development as a controlled loop: implement, verify independently, bounce back and fix. Quality converges through the loop.", "footer.product": "Product", "footer.p1": "Why Fenixd", "footer.p2": "Capabilities", "footer.p3": "Changelog", "footer.p4": "Roadmap", "footer.docs": "Docs", "footer.d1": "Quick Start", "footer.d2": "Concepts &amp; Architecture", "footer.d3": "CLI Handbook", "footer.d4": "FAQ &amp; Troubleshooting", "footer.community": "Community", "footer.c1": "GitHub", "footer.c2": "Discussions", "footer.c3": "Report an Issue", "footer.c4": "Contributing", "footer.about": "About", "footer.a1": "Blog", "footer.a2": "Contact", "footer.legal": "© 2026 Fenixd · Fenix Loop Engineering Framework", "footer.dogfood": "Fenixd is developed by Fenixd itself, so is this site", "pal.ember": "Ember", "pal.violet": "Violet", "pal.orchid": "Orchid", "pal.royal": "Royal Purple", "pal.aurora": "Aurora Duo", "pal.orchid-aurora": "Orchid Aurora (current default · orchid × aurora)", "title": "Community · Fenixd", "hero.eyebrow": "COMMUNITY", "hero.h1": "<span class=\"grad-text\">The Fenixd community</span>", "hero.lede": "Fenixd evolves in the open: every SPEC is a public experiment, every state transition is on the record. Come look, or take part.", "gh.repo": "Fenixd / Fenixd", "gh.desc": "Fenix Loop Engineering Framework, a harness-neutral automated software development loop framework (Claude Code, DSH and more). This repo is driven by Fenixd itself.", "gh.s1": "stars (sample)", "gh.s2": "forks (sample)", "gh.s3": "issues", "gh.s4": "language", "gh.clone": "git clone", "gh.b1": "Open repository", "gh.b2": "File an issue", "side.1.t": "Discussions", "side.1.d": "Usage Q&amp;A, case studies, roadmap co-design", "side.2.t": "Bug reports", "side.2.d": "An issue template with .fenix/ artifacts and logs locates defects faster", "side.3.t": "Release feed", "side.3.d": "Release &amp; changelog notifications", "side.4.t": "WeChat group", "side.4.d": "Chinese user group; entry in README (sample)", "road.eyebrow": "RELEASE NOTES", "road.title": "Recent updates", "road.1.v": "v0.9.x", "road.1.t": "Bounce-back loop converges better", "road.1.d": "Tiered budget-breaker thresholds; regression rate down sharply (sample data)", "road.2.v": "v0.8.x", "road.2.t": "Verification engine multi-modal", "road.2.d": "web / api / cli scenario runners; Playwright screenshot diffing (sample data)", "road.3.v": "v0.7.x", "road.3.t": "Knowledge atlas lands", "road.3.d": "spec/knowledge/ domain index + backfill lanes (sample data)", "road.link": "Full changelog (sample)", "ct.eyebrow": "CONTRIBUTE", "ct.title": "Get involved", "ct.lede": "From a one-line issue to a core-module PR, every level of participation is welcome, after all, turning one sentence into a full delivery is what this project does best.", "ct.1.t": "Report bugs", "ct.1.d": "Attach .fenix/ artifacts per the issue template; the code-fix lane digests them in batches", "ct.2.t": "Improve docs", "ct.2.d": "docs/help/ mirrors the Dashboard Help menu, a typo fix is a contribution", "ct.3.t": "Send PRs", "ct.3.d": "Core changes follow the SPEC flow too, open an issue to align first", "ct.4.t": "Share cases", "ct.4.d": "Publish your SPEC case studies and tuning notes in Discussions", "cta.t": "Start from an issue", "cta.d": "Or install one first, let the loop turn your first sentence into code."}};
+(function () {
+  var dict = window.PROTO_I18N;
+  function apply(lang) {
+    var pack = dict[lang] || {};
+    document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN';
+    if (pack.title) document.title = pack.title;
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var k = el.getAttribute('data-i18n');
+      if (pack[k] !== undefined) el.innerHTML = pack[k];
+    });
+    document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+      var k = el.getAttribute('data-i18n-ph');
+      if (pack[k] !== undefined) el.setAttribute('placeholder', pack[k]);
+    });
+    document.querySelectorAll('[data-i18n-title]').forEach(function (el) {
+      var k = el.getAttribute('data-i18n-title');
+      if (pack[k] !== undefined) el.setAttribute('title', pack[k]);
+    });
+    document.querySelectorAll('[data-i18n-label]').forEach(function (el) {
+      var k = el.getAttribute('data-i18n-label');
+      if (pack[k] !== undefined) el.setAttribute('aria-label', pack[k]);
+    });
+    document.getElementById('lang-zh').classList.toggle('on', lang === 'zh');
+    document.getElementById('lang-en').classList.toggle('on', lang === 'en');
+    try { localStorage.setItem('fenixd-proto-lang', lang); } catch (e) {}
+  }
+  document.getElementById('lang-zh').addEventListener('click', function () { apply('zh'); });
+  document.getElementById('lang-en').addEventListener('click', function () { apply('en'); });
+  var saved = 'zh';
+  try { saved = localStorage.getItem('fenixd-proto-lang') || 'zh'; } catch (e) {}
+  apply(saved);
+  var burger = document.getElementById('nav-burger');
+  if (burger) burger.addEventListener('click', function () {
+    var m = document.getElementById('mobile-nav');
+    var open = m.classList.toggle('open');
+    burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  var PAL_DOCK = document.querySelector('.pal-dock');
+  if (PAL_DOCK) {
+    var dots = PAL_DOCK.querySelectorAll('.pal-dot');
+    var setPal = function (v, save) {
+      document.body.setAttribute('data-palette', v);
+      dots.forEach(function (d) { d.classList.toggle('on', d.getAttribute('data-pal') === v); });
+      if (save) { try { localStorage.setItem('fenixd-proto-palette', v); } catch (e) {} }
+    };
+    var sp = 'orchid-aurora';
+    try { sp = localStorage.getItem('fenixd-proto-palette') || 'orchid-aurora'; } catch (e) {}
+    if (sp !== 'orchid-aurora') setPal(sp, false);
+    dots.forEach(function (d) { d.addEventListener('click', function () { setPal(d.getAttribute('data-pal'), true); }); });
+  }
+})();
+</script>
+<script>
+(function(){
+  var shots = document.querySelectorAll('.card-shot img');
+  if (!shots.length) return;
+  var lb = document.createElement('div');
+  lb.className = 'lb'; lb.style.display = 'none';
+  lb.innerHTML = '<img alt=""><div class="lb-hint">ESC / click to close · 点击关闭</div>';
+  document.body.appendChild(lb);
+  var big = lb.querySelector('img');
+  shots.forEach(function(img){
+    img.addEventListener('click', function(){
+      big.src = img.src; lb.style.display = 'flex';
+    });
+  });
+  lb.addEventListener('click', function(){ lb.style.display = 'none'; });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') lb.style.display = 'none';
+  });
+})();
+</script>
+<script src="annotator.js" defer></script>
+</body>
+</html>
