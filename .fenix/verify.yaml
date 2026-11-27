@@ -1,168 +1,28 @@
 # =============================================================================
-# .fenix/verify.yaml — 声明式验证契约（模板）
-# =============================================================================
+# .fenix/verify.yaml — 验证契约
+# 2026-11-27 Administrator 起草（run admin-website-home-primary-pages-1795751860，
+# spec=website-home-primary-pages）。字段语义见 core/verify_contract.py 模块文档。
 #
-# 【本文件的作用】
-# 「最终用户验证」必须测"被测实现 fresh 构建出的可运行形态"。本文件向框架
-# 声明三件事：应用如何构建（prepare）、如何被服务成可访问实例（serve）、
-# 何时算就绪（ready）。框架在每轮验证前按序执行，并把验证场景的 URL 全量
-# 改写到本次启动的实例——保证场景永远打新鲜实现，而不是场景声明的
-# 地址或上一次构建的陈旧产物。
+# 站点形态（SPEC 设计 D1/D2/D5）：纯静态站点，python3 build_site.py 每轮验证前
+# fresh 构建到 site/dist/，GitHub Pages artifact 同为 site/dist——serve kind=static
+# 以 site/dist 为 URL 空间根目录（docroot），与 Pages 部署形态一致。
 #
-# `prepare`、`serve`、`ready` 完成（【使用前必读】见下）后，可继续配置：
-#
-# regression  可选。项目全量回归如何执行与如何解析结果。缺省不配 = 未配置
-#             全量回归（分面显示引导态、不派发、零报错）。Fenix 是通用开发
-#             框架，回归命令不硬编码为 pytest——由项目声明；命令须产出
-#             JUnit XML 结果文件（pytest --junit-xml、jest-junit、
-#             go-junit-report、maven-surefire 等均可；`testcase@time` 承载
-#             单个用例耗时，正是「长耗时用例」视图所需）。
-#   cmd       必填。全量回归命令，cwd=项目根；字符串=经 shell 执行，
-#             YAML 列表=argv 直接执行。命令 MUST 产出 JUnit XML。
-#   output    必填。命令产出的 JUnit XML 文件路径（相对项目根）。
-#   timeout_seconds         可选，正整数，缺省 1800。硬超时；超过则中止
-#                           整个进程组并按超时归类（回归为整进程组执行，
-#                           只杀直接子进程会让 shell 派生的测试进程存活）。
-#   format                  可选，固定 junit，缺省 junit。结果格式；
-#                           本次仅支持 JUnit XML（声明其它值整段无效）。
-#   long_test_threshold_seconds  可选，正数，缺省 8。单用例耗时超过即
-#                           计入「长耗时用例」表（含通过的用例）。
-#
-# # ── 全量回归示例（pytest 形态；被测项目按自身框架改写）──
-# regression:
-#   cmd: python3 -m pytest tests/ -q --junit-xml=.fenix/regression/junit.xml
-#   output: .fenix/regression/junit.xml
-#   timeout_seconds: 1800
-#   format: junit
-#   long_test_threshold_seconds: 8
-#
-# 【收编一致性】（regression_coverage_gap 预检）新增被测插件进 prepare
-# （pnpm --dir <pkg> install / run build 装配其依赖）时 MUST 同步在本段
-# 注册该插件的 install+test 条目（--frozen-lockfile --prefer-offline 形态，
-# 先例见同文件既有插件条目）——prepare 装配了包而 regression cmd 全文无
-# 该包引用时，契约装载即发 regression_coverage_gap WARNING（缺口清单+
-# regression 段行号指引，不阻断加载）：只装不测的插件在回归中零执行。
-#
-# 【使用前必读】
-# 下方所有配置行均以 # 注释：保持注释 = 无契约，框架回退旧行为（config 的
-# commands.start + 端口改写），对任何项目形态都安全。确认项目实际的构建与
-# 服务方式后，删除对应行首的 "# " 使其生效。可在 Dashboard 设置页
-# 「项目简介」面板在线编辑本文件；保存前编辑器会做 YAML 语法校验。
-#
-# 【字段说明】（完整权威文档见 core/verify_contract.py 模块注释）
-#
-# prepare   可选。构建步骤列表，验证前在项目根逐条执行：
-#   run     必填。字符串=经 shell 执行；YAML 列表=argv 直接执行
-#   cwd     可选。相对项目根的工作目录，缺省=项目根
-#           （收编对称提示：以 pnpm --dir <pkg> install / run build 装配新
-#           被测插件时，MUST 同步在 regression 段注册该插件的 install+test
-#           条目（--frozen-lockfile --prefer-offline 形态），否则契约装载
-#           会发 regression_coverage_gap WARNING——见 regression 段
-#           【收编一致性】）
-#
-# serve     可选。被测实例的启动方式；缺省回退 commands.start（旧行为）
-#   kind    static=框架内置静态服务器（服务 root 目录，自动分配端口）
-#           command=启动长驻服务命令（形态同 commands.start，项目根为 cwd）
-#   root    kind=static 必填。URL 空间的根目录（相对项目根）——注意取的
-#           是"路径前缀成立"的目录：应用以 /dist/ 路径访问时 root 应取
-#           dist 的父目录而非 dist 本身
-#   cmd     kind=command 必填。服务启动命令
-#   port    kind=command 可选。端口提示（供场景端口改写扫描）；
-#           缺省时框架从 cmd 的 --port/-p 参数提取
-#
-# ready     可选。就绪探针；缺省探实例根路径、期望 200、等待 60 秒
-#   url     探针路径（相对被测实例）
-#   expect  期望 HTTP 状态码
-#   timeout 就绪等待上限（秒）
-#
-# 【铁律】验证场景的 URL 由框架注入改写（BASE_URL），场景编写者与 planner
-# 不需要（也不应该）硬编码实例地址。
-#
-# 【契约形态按场景集反推】（verify-runner-engine，零新增字段）
-# serve/ready 是否必需由本轮场景集的 kind 组成反推：
-#   - 纯 cli 场景集：serve/ready 全省（不回退 commands.start，无实例可跑
-#     CLI 场景）；prepare 失败仍是唯一环境门
-#   - 含 web 或 api 场景：serve 段（或 commands.start 兜底）必须有效，
-#     缺失时验收报错打回 plan
-#   - 混合场景集：serve 照常启动，cli 场景额外获得实例环境变量注入
-#     （FENIX_VERIFY_BASE_URL / FENIX_VERIFY_PORT，框架值优先）
+# regression 段省略：项目无测试体系（config commands.test 为占位符，本 SPEC
+# 交付物无测试框架），不臆造无法产出 JUnit XML 的回归命令（臆造会让周期回归
+# 每天 parse_error 空转）。
 # =============================================================================
 
-# ── 构建步骤示例（构建型应用取消注释并按项目修改；纯源码运行型整段省略）──
-# prepare:
-#   - run: npm run build            # 字符串=经 shell 执行；列表=argv 直接执行
-#     cwd: .                        # 相对项目根的工作目录，缺省=项目根
-#
-# ── 宿主预检样板（evo-verify-infra-retry-lane 2.1，可选）──────────────────
-# 验证宿主被多轮验证反复复用，上一轮遗留的僵尸模拟器/陈旧锁会把下一轮
-# prepare/可达性探针直接打死（0 场景执行短路）。建议把「环境自检+自愈」
-# 作为 prepare 首个步骤声明在构建命令之前；预检命令须**幂等**（每轮验证
-# 都会执行）且失败即非零退出——prepare 失败会走 infra-retry 廉价重试车道
-# （不升级、不冻结：框架自动限次重派验证，缺省 2 次；超限才恢复既有
-# 全价升级）。因此预检应把「可自动修复的环境问题」在宿主侧修掉，把
-# 「修不掉的」以非零退出如实上报，不要吞错退 0（假绿会把环境故障推迟
-# 到场景执行期，错过廉价重试窗口）。
-#
-# 预检清单参考（按被测项目实际依赖取舍）：
-#
-# ① 无主 qemu/emulator 进程扫描清理：只清理 ppid=1（父进程已死、无人
-#    回收）**且可归属到已完成 run** 的模拟器进程；清理前记录被杀 pid
-#    便于事后追因。MUST NOT 全量清杀——同宿主可能在跑其它活跃 run 的
-#    模拟器（按进程启动时间与 run 时间窗归属，归属不了的不动）。
-#    示例（按项目改写；qemu-system / emulator 进程名按实际替换）：
-# - run: |
-#     for pid in $(pgrep -f 'qemu-system|emulator' || true); do
-#       [ "$(ps -o ppid= -p "$pid" | tr -d ' ')" = "1" ] || continue
-#       echo "killing orphan emulator pid=$pid" >> .fenix/preflight-killed.log
-#       kill "$pid" || true
-#     done
-#
-# ② 残留 AVD 锁清理：模拟器崩溃后 hardware/qemu/ *.lock 会卡死下一轮
-#    启动。只删明确属于本项目 AVD 目录的锁文件：
-# - run: find "$HOME/.android/avd" -name '*.lock' -delete 2>/dev/null || true
-#
-# ③ KVM/内存水位检查：/dev/kvm 不可用、内存水位过低时尽早失败（此时
-#    失败=廉价重试窗口内可观测），不要拖到模拟器启动超时：
-# - run: test -w /dev/kvm && free -m | awk 'NR==2{exit !(($7)>512)}'
-#
-# ④ 场景特异冒烟探针：被测项目依赖的重量级运行时（如 OpenCV init、
-#    GPU/驱动探测）在 prepare 末尾加一条最小可运行性探针，把「依赖缺失/
-#    版本不兼容」前移到构建前暴露：
-# - run: python3 -c "import cv2; cv2.setNumThreads(0)"
-#
-# 说明：以上命令均为示例形态，请按被测项目实际宿主依赖改写；全部保持
-# 注释即整段不生效（与模板其余段落同约定）。
+prepare:
+  # build_site.py 为本 SPEC 实现交付物（tasks 2.x）；构建失败＝验证环境错误，
+  # 走 infra-retry 廉价重试车道，不判产品缺陷。设计 D3：fenixd 浅克隆失败显式
+  # 非零退出（构建依赖外网为已知风险，缓存 .site-cache/fenixd 复用缓解）。
+  - run: python3 build_site.py
 
-# ── 被测实例示例一：静态目录（框架内置服务器，自动分配端口）──
-# serve:
-#   kind: static
-#   root: dist                      # URL 空间的根目录（相对项目根）
+serve:
+  kind: static
+  root: site/dist
 
-# ── 被测实例示例二：命令行长驻服务（形态同 config commands.start）──
-# serve:
-#   kind: command
-#   cmd: python3 -m http.server 8787
-#   port: 8787                      # 可选。缺省从 cmd 的 --port/-p 参数提取
-
-# ── 就绪探针示例（缺省探根路径、期望 200、等待 60 秒）──
-# ready:
-#   url: /
-#   expect: 200
-#   timeout: 60
-
-# ── 验证证据落位目录（add-verify-evidence-placement-contract，可选）──────
-# 验证/核查 run 产生的原始证据（扫描结果/转储/探针产物）统一落消费项目主树
-# （绝对路径 = 项目根/<evidence_dir>），与 worktree 生命周期解耦——worktree
-# 销毁后报告引用不断链；报告本体只引用以主树根为基准的相对路径。
-# 缺省（本段保持注释=未声明）：.fenix/verify-evidence/<spec>/（<spec> 按
-# SPEC 名替换）。.fenix/ 被消费项目忽略规则覆盖，不产生 untracked 噪声。
-# 声明其它相对路径时以其为准；绝对路径/含 ".." 段等非法值回退缺省并告警。
-# evidence_dir: .fenix/verify-evidence/<spec>/
-#
-# ── 验证证据分级留存（verify-evidence-tiered-retention，可选）────────────
-# 超过阈值（缺省 10485760 即 10MB）的二进制证据不入 git：改落 sha256
-# sidecar + 复现命令 + 存放路径登记文件（与报告同目录），哈希与登记信息
-# 即可支撑「逐字节一致」核查；文本/JSON/哈希/小日志不受限，直接入库。
-# 缺失或非法值（负数/非整数/bool）静默回退缺省，不报错、不阻断契约加载。
-# evidence_retention:
-#   max_binary_bytes: 10485760       # 缺省 10MB；声明其它正整数时以其为准
+ready:
+  url: /
+  expect: 200
+  timeout: 60
