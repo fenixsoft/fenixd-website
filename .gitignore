@@ -21,3 +21,7 @@ __pycache__/
 # 在此追加 `!` 规则即可。
 !.fenix/todo.md
 !.fenix/verify.yaml
+
+# 站点构建产物与源仓库克隆缓存（build_site.py 运行时落盘，不入库；Pages 由 Actions 构建）
+site/dist/
+.site-cache/
