@@ -4,17 +4,21 @@
  *
  * 与 ppt 原版的差异：
  * - 本站经 GitHub Pages 项目路径发布，CDN 域名上路径透传为
- *   https://${CDN_DOMAIN}${SITE_BASE}/（SITE_BASE 默认 /fenixd-website，
- *   由 workflow env 提供；若 CDN 源站配置了路径重写，调整 env 即可）。
+ *   https://${CDN_DOMAIN}${SITE_BASE}/（SITE_BASE 默认空串=根路径，
+ *   若 CDN 配置了路径前缀/重写，经 workflow env SITE_BASE 调整）。
  * - 预热 URL 清单从 WARMUP_URLS_FILE（默认 warmup-urls.txt）读取，
  *   由 workflow 在部署机上按真相源文件树生成（五页 + help 16 篇），
  *   文件缺失时回退到站点根与文档中心入口。
  */
 
+// 站点经 Pages 自定义域（仓库根 CNAME）绑定，CDN 域名即站点根；
+// SITE_BASE 仅在 CDN 配置了路径前缀/重写时才需要设置（默认根路径）。
+const SITE_BASE = process.env.SITE_BASE ?? ''
+
 const DEFAULT_PATHS = [
-  `${process.env.SITE_BASE || '/fenixd-website'}/`,          // 站点根（英文首屏）
-  `${process.env.SITE_BASE || '/fenixd-website'}/index.html`,
-  `${process.env.SITE_BASE || '/fenixd-website'}/docs.html`  // 文档中心入口
+  `${SITE_BASE}/`,          // 站点根（英文首屏）
+  `${SITE_BASE}/index.html`,
+  `${SITE_BASE}/docs.html`  // 文档中心入口
 ]
 
 async function refreshCDN() {
@@ -71,7 +75,7 @@ async function refreshCDN() {
     console.log(`🚀 正在刷新 CDN: https://${cdnDomain}${process.env.SITE_BASE || '/fenixd-website'}/`)
 
     const flushResult = await client.PurgePathCache({
-      Paths: [`https://${cdnDomain}${process.env.SITE_BASE || '/fenixd-website'}/`],
+      Paths: [`https://${cdnDomain}${SITE_BASE}/`],
       FlushType: 'flush'
     })
 

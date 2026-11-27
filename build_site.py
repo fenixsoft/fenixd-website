@@ -125,6 +125,10 @@ def stage(tmp: Path) -> None:
         shutil.copyfile(PROTO / "assets" / name, tmp / "assets" / name)
     (tmp / "help").mkdir()
     # annotator.js 属原型脚手架，不复制进站点
+    # GitHub Pages 自定义域：CNAME 文件必须位于发布 artifact 根
+    cname = Path(__file__).resolve().parent / "CNAME"
+    if cname.exists():
+        shutil.copyfile(cname, tmp / "CNAME")
 
 
 # ============================================================ 3. sanitize

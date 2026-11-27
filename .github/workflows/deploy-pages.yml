@@ -64,23 +64,24 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # 预热清单按真相源文件树生成（五页 + help 渲染页），避免硬编码过期
+      # 预热清单按真相源文件树生成（五页 + help 渲染页），避免硬编码过期。
+      # 站点经 Pages 自定义域 dev.icyfenix.cn 绑定（仓库根 CNAME），
+      # CDN 域名与 Pages 站点根一一对应，清单为根路径形式。
       - name: Build warmup URL list
         run: |
           {
-            echo "https://${CDN_DOMAIN}${SITE_BASE}/"
+            echo "https://${CDN_DOMAIN}/"
             for f in index why capabilities docs community; do
-              echo "https://${CDN_DOMAIN}${SITE_BASE}/${f}.html"
+              echo "https://${CDN_DOMAIN}/${f}.html"
             done
             for f in specs/website-home-primary-pages/prototype/help/*.html; do
-              echo "https://${CDN_DOMAIN}${SITE_BASE}/help/$(basename "$f")"
+              echo "https://${CDN_DOMAIN}/help/$(basename "$f")"
             done
           } > warmup-urls.txt
           echo "预热清单 $(wc -l < warmup-urls.txt) 条："
           head -8 warmup-urls.txt
         env:
           CDN_DOMAIN: ${{ secrets.CDN_DOMAIN || vars.CDN_DOMAIN }}
-          SITE_BASE: /fenixd-website
 
       - name: Refresh Tencent CDN
         run: npm run cdn:refresh
@@ -88,5 +89,5 @@ jobs:
           TENCENT_SECRET_ID: ${{ secrets.TENCENT_SECRET_ID || vars.TENCENT_SECRET_ID }}
           TENCENT_SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY || vars.TENCENT_SECRET_KEY }}
           CDN_DOMAIN: ${{ secrets.CDN_DOMAIN || vars.CDN_DOMAIN }}
-          SITE_BASE: /fenixd-website
+          SITE_BASE: ""
         continue-on-error: true
