@@ -36,9 +36,9 @@
 
 ## 2. 构建管线 build_site.py
 
-- [ ] 2.1 实现 stage 与 sanitize：复制五页+静态资源到 site/dist/（保留 i18n 引擎与站点交互），移除仿样横幅块（class 含 proto-banner）、`<script src="annotator.js">`、配色 dock（data-proto-id 以 -palette-dock 结尾元素及其 localStorage 初始化脚本块）；净化后 grep 断言三标记零残留、语言切换按钮仍在
+- [ ] 2.1 实现 stage 与 sanitize：复制五页+静态资源到 site/dist/（静态资源复制 MUST 排除原型脚手架文件 annotator.js；保留 i18n 引擎与站点交互），移除仿样横幅块（class 含 proto-banner）、annotator.js 的 script 引用（实测形如 `<script src="annotator.js" defer>`，按 src 含 annotator.js 匹配）、配色 dock（data-proto-id 以 -palette-dock 结尾元素及其 localStorage 初始化脚本块）；净化后 grep 断言三标记零残留、语言切换按钮仍在
 - [ ] 2.2 实现 render_docs：浅克隆 github.com/fenixsoft/fenixd 至 .site-cache/fenixd（已存在则 git fetch --depth 1 复用），迁移 generator/build_proto.py 的 md_to_html/help_meta 渲染逻辑生成 site/dist/help/*.html，docs.html 文档中心卡片标题/摘要/篇数同步真实文档；克隆失败非零退出
-- [ ] 2.3 实现 inject_gh_data：请求 api.github.com/repos/fenixsoft/fenixd，将 stargazers_count/forks_count/open_issues_count 注入 community.html 数据卡三值（原型示例假数据 2.1k/318/47 所在的 comm-stat-* 包装），沿用原型 >=1000 显示 x.xk 格式化；API 失败注入 -- 并打印 WARN，构建继续
+- [ ] 2.3 实现 inject_gh_data：请求 api.github.com/repos/fenixsoft/fenixd，将 stargazers_count/forks_count/open_issues_count 注入 community.html 数据卡三值（原型示例假数据 2.1k/318/47，位于 data-proto-id="comm-gh-stats" 容器内按序前三处 `<div class="v num">`；第 4 格 gh.s4 为语言静态值 Python，MUST NOT 改动），沿用原型 >=1000 显示 x.xk 格式化；API 失败注入 -- 并打印 WARN，构建继续
 - [ ] 2.4 实现收尾 verify 与本地冒烟：产物资源引用完整性（img/script/内链 href 目标存在于 dist）；`python3 -m http.server` 起临时服务探测五页+至少 3 篇 help 页 200、净化项 404/不存在；构建末尾打印产物清单（文件数/总大小）
 
 ## 3. Pages 部署与一次性设置
@@ -50,5 +50,5 @@
 
 ## 4. 端到端验收
 
-- [ ] 4.1 全链路构建冒烟：干净环境（删除 site/dist 与 .site-cache）跑 python3 build_site.py 一次成功；产物 diff 原型仅命中净化标记与 comm-stat-* 动态值（静态内容一致性抽查：五页标题/H1/导航六项/页脚与原型一致）；help 页数与 fenixd docs/help 文档数一致
-- [ ] 4.2 交付物自查：Deliverables 九项全部落位且路径准确；QA 产物（构建输出/冒烟记录）留存 .fenix/verify-serving/ 或 tasks 描述内可复现命令
+- [ ] 4.1 全链路构建冒烟：干净环境（删除 site/dist 与 .site-cache）跑 python3 build_site.py 一次成功；产物 diff 原型仅命中净化标记与 comm-gh-stats 容器内动态值（静态内容一致性抽查：五页标题/H1/导航六项/页脚与原型一致）；help 页数与 fenixd docs/help 文档数一致
+- [ ] 4.2 交付物自查：Deliverables 八项全部落位且路径准确；QA 产物（构建输出/冒烟记录）留存 .fenix/verify-serving/ 或 tasks 描述内可复现命令
