@@ -43,3 +43,50 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  # Pages 部署成功后刷新并预热腾讯云 CDN（境内加速）。
+  # 环境变量已由仓库设置（Secrets/Variables 皆可，表达式 secrets.X || vars.X 双兼容）：
+  # CDN_DOMAIN、TENCENT_SECRET_ID、TENCENT_SECRET_KEY
+  cdn-refresh:
+    runs-on: ubuntu-latest
+    needs: build-deploy
+    if: success()
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # 预热清单按真相源文件树生成（五页 + help 渲染页），避免硬编码过期
+      - name: Build warmup URL list
+        run: |
+          {
+            echo "https://${CDN_DOMAIN}${SITE_BASE}/"
+            for f in index why capabilities docs community; do
+              echo "https://${CDN_DOMAIN}${SITE_BASE}/${f}.html"
+            done
+            for f in specs/website-home-primary-pages/prototype/help/*.html; do
+              echo "https://${CDN_DOMAIN}${SITE_BASE}/help/$(basename "$f")"
+            done
+          } > warmup-urls.txt
+          echo "预热清单 $(wc -l < warmup-urls.txt) 条："
+          head -8 warmup-urls.txt
+        env:
+          CDN_DOMAIN: ${{ secrets.CDN_DOMAIN || vars.CDN_DOMAIN }}
+          SITE_BASE: /fenixd-website
+
+      - name: Refresh Tencent CDN
+        run: npm run cdn:refresh
+        env:
+          TENCENT_SECRET_ID: ${{ secrets.TENCENT_SECRET_ID || vars.TENCENT_SECRET_ID }}
+          TENCENT_SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY || vars.TENCENT_SECRET_KEY }}
+          CDN_DOMAIN: ${{ secrets.CDN_DOMAIN || vars.CDN_DOMAIN }}
+          SITE_BASE: /fenixd-website
+        continue-on-error: true

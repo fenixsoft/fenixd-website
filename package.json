@@ -1,0 +1,12 @@
+{
+  "name": "fenixd-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "fenixd 官网（纯静态站点；本 package.json 仅供部署后的腾讯云 CDN 刷新/预热脚本使用，站点本体零 npm 依赖）",
+  "scripts": {
+    "cdn:refresh": "node scripts/cdn-refresh.js"
+  },
+  "dependencies": {
+    "tencentcloud-sdk-nodejs-cdn": "^4.1.200"
+  }
+}

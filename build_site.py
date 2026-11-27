@@ -165,6 +165,27 @@ def sanitize(html: str, page: str) -> str:
             and "card-shot" in html)
     if not kept:
         raise BuildError("sanitize", f"{page}: 站点交互元素缺失（语言切换/移动端导航/i18n/灯箱）")
+    return set_default_lang(html, page)
+
+
+# 默认语言英文化（构建层后处理；原型真相源保持中文初显不动）：
+# 无 localStorage 偏好的访客首屏英文；手动切换 zh 后仍记忆（localStorage 机制不变）。
+# help/*.html 渲染页不参与：文档本体是中文内容，lang="zh" 语义正确。
+def set_default_lang(html: str, page: str) -> str:
+    subs = [
+        ('<html lang="zh-CN"', '<html lang="en"', 1),
+        ("var saved = 'zh';", "var saved = 'en';", 1),
+        ("localStorage.getItem('fenixd-proto-lang') || 'zh'",
+         "localStorage.getItem('fenixd-proto-lang') || 'en'", 1),
+    ]
+    for old, new, expect in subs:
+        n = html.count(old)
+        if n != expect:
+            raise BuildError("sanitize",
+                             f"{page}: 默认语言替换锚「{old[:48]}」匹配 {n} 处（预期 {expect}）")
+        html = html.replace(old, new)
+    if "|| 'zh'" in html:
+        raise BuildError("sanitize", f"{page}: 默认语言替换后仍有 'zh' 回退残留")
     return html
 
 

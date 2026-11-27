@@ -25,3 +25,13 @@ __pycache__/
 # 站点构建产物与源仓库克隆缓存（build_site.py 运行时落盘，不入库；Pages 由 Actions 构建）
 site/dist/
 .site-cache/
+
+# 站点构建产物与本地缓存（build_site.py 产出/复用，不入库）
+site/dist/
+.site-cache/
+
+# CDN 刷新预热清单（workflow 运行时生成）
+warmup-urls.txt
+
+# npm（仅 CDN 刷新脚本依赖；站点本体零 npm 依赖）
+node_modules/
