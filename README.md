@@ -33,8 +33,8 @@ push 到 main 自动触发 [`.github/workflows/deploy-pages.yml`](.github/workfl
 Pages 部署成功后，同一 workflow 的 `cdn-refresh` job 自动执行腾讯云 CDN 刷新与预热（迁移自 ~/ppt 工程）：
 
 - `scripts/cdn-refresh.js`：目录刷新（`PurgePathCache`，覆盖站点全部文件）+ 关键页预热（`PushUrlsCache`，境内节点）；凭据缺失时跳过、调用失败不阻断部署链（continue-on-error 双保险）。
-- 预热清单由 workflow 按真相源文件树生成（五页 + help 渲染页 22 条 URL），清单写入 `warmup-urls.txt`（运行时产物，已 gitignore）。
-- 前置条件（一次性，仓库层配置）：`CDN_DOMAIN`、`TENCENT_SECRET_ID`、`TENCENT_SECRET_KEY` 三项已在 GitHub 仓库 Secrets/Variables 设置（workflow 以 `secrets.X || vars.X` 双兼容读取）；腾讯云 CDN 域名已配置回源 `fenixsoft.github.io`（Host 头透传，路径 `/fenixd-website/` 保持——workflow env `SITE_BASE` 单点可调）。
+- 预热清单由 workflow 按真相源文件树生成（五页 + help 渲染页 22 条根路径 URL），清单写入 `warmup-urls.txt`（运行时产物，已 gitignore）。
+- 域名形态：`dev.icyfenix.cn` 已绑定为 Pages 自定义域（仓库根 [CNAME](CNAME)，Pages API cname=dev.icyfenix.cn，https_enforced=False），CDN 回源 Host=加速域名即可，域名根即站点根；站点经腾讯云边缘加速，Pages 与 CDN 两入口并存。若未来 CDN 配置路径前缀/重写，经 workflow env `SITE_BASE` 单点调整。
 - 本地手动刷新：`npm ci && CDN_DOMAIN=<域名> TENCENT_SECRET_ID=<id> TENCENT_SECRET_KEY=<key> npm run cdn:refresh`（需 Node 18+）。
 
 ## 人工步骤（一次性）
