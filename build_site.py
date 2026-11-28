@@ -25,6 +25,7 @@ build_site.py · fenixd-website 站点构建管线
 from __future__ import annotations
 
 import json
+import os
 import posixpath
 import re
 import shutil
@@ -42,7 +43,7 @@ SITE = ROOT / "site"
 DIST = SITE / "dist"
 TMP = SITE / ".tmp-build"
 CACHE = ROOT / ".site-cache" / "fenixd"
-SRC_REPO_URL = "https://github.com/fenixsoft/fenixd"
+SRC_REPO_URL = os.environ.get("FENIXD_SRC_URL", "https://github.com/fenixsoft/fenixd")
 GH_API_URL = "https://api.github.com/repos/fenixsoft/fenixd"
 GITHUB_BLOB_BASE = "https://github.com/fenixsoft/fenixd/blob/main"
 
