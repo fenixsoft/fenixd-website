@@ -161,7 +161,7 @@ def md_to_html(src, fname):
             + "</body></html>")
 
 
-OUT_DIR = os.path.dirname(os.path.abspath(__file__))
+OUT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # 生成器位于 prototype/generator/，产物落原型根
 
 # ============================================================ ICONS（内联 SVG，禁 emoji）
 def icon(name, cls="ic"):
@@ -1024,12 +1024,12 @@ def page_index():
       <article class="card" data-proto-id="home-q-step-1">
         <div class="card-head"><div class="card-ic">{icon("terminal")}</div><h3 data-i18n="q.s1.t">…</h3></div>
         <p data-i18n="q.s1.d">…</p>
-        <div class="term-body mono" style="border:1px solid var(--line);border-radius:8px;background:var(--term-bg);padding:10px 14px"><span class="t-p">$</span> <span class="t-c">curl -fsSL https://fenixd.example/install.sh | bash</span></div>
+        <div class="term-body mono" style="border:1px solid var(--line);border-radius:8px;background:var(--term-bg);padding:10px 14px"><span class="t-p">❯</span> <span class="t-c">https://dev.icyfenix.cn/install.md</span><br><span class="t-o" data-i18n="q.s1.code">按手册安装 Fenixd 与插件</span></div>
       </article>
       <article class="card" data-proto-id="home-q-step-2">
         <div class="card-head"><div class="card-ic">{icon("spec")}</div><h3 data-i18n="q.s2.t">…</h3></div>
         <p data-i18n="q.s2.d">…</p>
-        <div class="term-body mono" style="border:1px solid var(--line);border-radius:8px;background:var(--term-bg);padding:10px 14px"><span class="t-p">$</span> <span class="t-c">fenix-new</span> <span class="t-o" data-i18n="q.s2.code">"一句话需求"</span></div>
+        <div class="term-body mono" style="border:1px solid var(--line);border-radius:8px;background:var(--term-bg);padding:10px 14px"><span class="t-p">❯</span> <span class="t-c" style="color:var(--ember)">/fenix-new</span> <span class="t-o" data-i18n="q.s2.code">"一句话需求"</span></div>
       </article>
       <article class="card" data-proto-id="home-q-step-3">
         <div class="card-head"><div class="card-ic">{icon("rocket")}</div><h3 data-i18n="q.s3.t">…</h3></div>
@@ -1101,8 +1101,9 @@ def page_index():
         "cap.6.t": "隔离 Worktree", "cap.6.d": "每次实现跑在独立 git worktree 与分支，merge-back 冲突自愈，失控的变更永远污染不了主干。",
         "cap.7.t": "自愈熔断", "cap.7.d": "Administrator / Arbiter 自愈链自动处置困境；无法自愈时明确停靠 blocked 等人裁决，专业知识保留在循环之内。",
         "cap.8.t": "实时 Dashboard", "cap.8.d": "跨项目聚合每个 SPEC 的实时流转、日志与验证产物。熵增不可怕，不可见才可怕。",
-        "q.s1.t": "① 接入 Fenixd", "q.s1.d": "一行脚本装好 daemon（systemd 常驻、supervisor 托管），Linux / Windows 双平台。",
-        "q.s2.t": "② 一句话立项", "q.s2.d": "/fenix-new 说出想法，需求 Agent 澄清并生成完整 SPEC，按复杂度建议执行模式。",
+        "q.s1.t": "① 接入 Fenixd", "q.s1.d": "把安装手册的地址交给 harness（Claude Code / dsh web），agent 读取后按说明完成 Fenixd 框架与 dsh 插件的装配。",
+        "q.s1.code": "按手册安装 Fenixd 与插件",
+        "q.s2.t": "② 一句话立项", "q.s2.d": "/fenix-new 是 harness 中的 skill：在对话框输入它（而非 bash 终端），说出想法即完成立项。",
         "q.s2.code": "\"一句话需求\"", "q.s3.code": "→ /fenix-approve 审批推送",
         "q.s3.t": "③ 等代码交付", "q.s3.d": "daemon 自动拾取 → 实现 → 验证 → done，你在唯一人工门禁处审批推送。",
         "g.1.t": "快速上手", "g.1.d": "从零到交付的端到端流程",
@@ -1124,8 +1125,9 @@ def page_index():
         "cap.6.t": "Isolated Worktrees", "cap.6.d": "Every implementation runs in its own git worktree and branch, with merge-back self-healing, a runaway change can never pollute the trunk.",
         "cap.7.t": "Self-Healing", "cap.7.d": "Administrator / Arbiter chains handle dead ends automatically; otherwise the SPEC parks visibly at blocked awaiting human ruling, expertise stays inside the loop.",
         "cap.8.t": "Live Dashboard", "cap.8.d": "Every SPEC's live transitions, logs and verification artifacts, aggregated across projects. Entropy is not the enemy; invisible entropy is.",
-        "q.s1.t": "1 · Install the daemon", "q.s1.d": "One-line script sets up the daemon (systemd-resident, supervisor-managed) on Linux and Windows.",
-        "q.s2.t": "2 · File a one-liner", "q.s2.d": "/fenix-new states your idea; the requirement agent clarifies and drafts a full SPEC, recommending an execution mode.",
+        "q.s1.t": "1 · Install Fenixd", "q.s1.d": "Hand the install guide's URL to your harness (Claude Code / dsh web); the agent reads it and sets up the fenixd framework and dsh plugins as instructed.",
+        "q.s1.code": "install fenixd &amp; plugins per the guide",
+        "q.s2.t": "2 · File a one-liner", "q.s2.d": "/fenix-new is a harness skill: type it in the harness chat (not a bash terminal) and state your idea to start a SPEC.",
         "q.s2.code": "\"one-liner requirement\"", "q.s3.code": "→ /fenix-approve review &amp; push",
         "q.s3.t": "3 · Wait for code", "q.s3.d": "The daemon picks it up → implements → verifies → done; you approve the push at the single human gate.",
         "g.1.t": "Quick Start", "g.1.d": "End-to-end flow from zero to delivery",

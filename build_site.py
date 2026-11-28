@@ -129,6 +129,10 @@ def stage(tmp: Path) -> None:
     cname = Path(__file__).resolve().parent / "CNAME"
     if cname.exists():
         shutil.copyfile(cname, tmp / "CNAME")
+    # 机器可读安装入口（harness 按 it 指引安装 fenixd）
+    inst = Path(__file__).resolve().parent / "install.md"
+    if inst.exists():
+        shutil.copyfile(inst, tmp / "install.md")
 
 
 # ============================================================ 3. sanitize
